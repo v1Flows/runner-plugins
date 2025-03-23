@@ -44,14 +44,13 @@ jobs:
           echo "Action Plugins: ${{ steps.list-action.outputs.plugins }}"
           echo "Endpoint Plugins: ${{ steps.list-endpoint.outputs.plugins }}"
 
-  build-plugins:
-    name: Build Plugins
+  build-action-plugins:
+    name: Build Action Plugins
     needs: list-plugins
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        plugin-type: [action-plugins, endpoint-plugins]
-        plugin-name: ${{ fromJson(needs.list-plugins.outputs[plugin-type]) }}
+        plugin-name: ${{ fromJson(needs.list-plugins.outputs.action-plugins) }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -61,13 +60,26 @@ jobs:
         with:
           go-version: '1.23'
 
-      - name: Verify Directory
-        run: |
-          if [ ! -d "${{ matrix.plugin-type }}/${{ matrix.plugin-name }}" ]; then
-            echo "Directory does not exist: ${{ matrix.plugin-type }}/${{ matrix.plugin-name }}"
-            exit 1
-          fi
+      - name: Build Plugin
+        working-directory: action-plugins/${{ matrix.plugin-name }}
+        run: go build
+
+  build-endpoint-plugins:
+    name: Build Endpoint Plugins
+    needs: list-plugins
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        plugin-name: ${{ fromJson(needs.list-plugins.outputs.endpoint-plugins) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.23'
 
       - name: Build Plugin
-        working-directory: ${{ matrix.plugin-type }}/${{ matrix.plugin-name }}
+        working-directory: endpoint-plugins/${{ matrix.plugin-name }}
         run: go build
