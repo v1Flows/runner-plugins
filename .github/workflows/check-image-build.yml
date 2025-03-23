@@ -13,15 +13,26 @@ jobs:
     name: List Plugins
     runs-on: ubuntu-latest
     outputs:
-      plugins: ${{ steps.list.outputs.plugins }}
+      action-plugins: ${{ steps.list-action.outputs.plugins }}
+      endpoint-plugins: ${{ steps.list-endpoint.outputs.plugins }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: List Plugins
-        id: list
+      - name: List Action Plugins
+        id: list-action
         run: |
-          PLUGINS=$(find action-plugins endpoint-plugins -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | jq -R -s -c 'split("\n")[:-1]')
+          PLUGINS=$(find action-plugins -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | jq -R -s -c 'split("\n")[:-1]')
+          if [ -z "$PLUGINS" ]; then
+            echo "::set-output name=plugins::[]"
+          else
+            echo "::set-output name=plugins::$PLUGINS"
+          fi
+
+      - name: List Endpoint Plugins
+        id: list-endpoint
+        run: |
+          PLUGINS=$(find endpoint-plugins -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | jq -R -s -c 'split("\n")[:-1]')
           if [ -z "$PLUGINS" ]; then
             echo "::set-output name=plugins::[]"
           else
@@ -30,7 +41,8 @@ jobs:
 
       - name: Debug Plugins
         run: |
-          echo "Plugins: $PLUGINS"
+          echo "Action Plugins: ${{ steps.list-action.outputs.plugins }}"
+          echo "Endpoint Plugins: ${{ steps.list-endpoint.outputs.plugins }}"
 
   build-plugins:
     name: Build Plugins
@@ -39,7 +51,7 @@ jobs:
     strategy:
       matrix:
         plugin-type: [action-plugins, endpoint-plugins]
-        plugin-name: ${{ fromJson(needs.list-plugins.outputs.plugins) }}
+        plugin-name: ${{ fromJson(needs.list-plugins.outputs[plugin-type]) }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
