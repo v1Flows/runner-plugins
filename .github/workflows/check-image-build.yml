@@ -22,7 +22,15 @@ jobs:
         id: list
         run: |
           PLUGINS=$(find action-plugins endpoint-plugins -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | jq -R -s -c 'split("\n")[:-1]')
-          echo "::set-output name=plugins::$PLUGINS"
+          if [ -z "$PLUGINS" ]; then
+            echo "::set-output name=plugins::[]"
+          else
+            echo "::set-output name=plugins::$PLUGINS"
+          fi
+
+      - name: Debug Plugins
+        run: |
+          echo "Plugins: $PLUGINS"
 
   build-plugins:
     name: Build Plugins
@@ -40,6 +48,13 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: '1.23'
+
+      - name: Verify Directory
+        run: |
+          if [ ! -d "${{ matrix.plugin-type }}/${{ matrix.plugin-name }}" ]; then
+            echo "Directory does not exist: ${{ matrix.plugin-type }}/${{ matrix.plugin-name }}"
+            exit 1
+          fi
 
       - name: Build Plugin
         working-directory: ${{ matrix.plugin-type }}/${{ matrix.plugin-name }}
