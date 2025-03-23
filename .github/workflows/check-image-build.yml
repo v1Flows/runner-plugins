@@ -1,0 +1,47 @@
+name: Check Plugin Build
+
+on:
+  pull_request:
+    types: [opened, reopened, edited, synchronize]
+    branches: [ "release/**", "develop" ]
+    paths-ignore:
+      - '.github/**'
+
+jobs:
+  list-plugins:
+    name: List Plugins
+    runs-on: ubuntu-latest
+    outputs:
+      plugins: ${{ steps.list.outputs.plugins }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: List Plugins
+        id: list
+        run: |
+          PLUGINS=$(find action-plugins endpoint-plugins -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | jq -R -s -c 'split("\n")[:-1]')
+          echo "plugins=$PLUGINS" >> $GITHUB_ENV
+        env:
+          plugins: ${{ steps.list.outputs.plugins }}
+
+  build-plugins:
+    name: Build Plugins
+    needs: list-plugins
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        plugin-type: [action-plugins, endpoint-plugins]
+        plugin-name: ${{ fromJson(needs.list-plugins.outputs.plugins) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.23'
+
+      - name: Build Plugin
+        working-directory: ${{ matrix.plugin-type }}/${{ matrix.plugin-name }}
+        run: go build
