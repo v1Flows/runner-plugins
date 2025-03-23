@@ -1,6 +1,7 @@
 name: Check Plugin Build
 
 on:
+  workflow_dispatch:
   pull_request:
     types: [opened, reopened, edited, synchronize]
     branches: [ "release/**", "develop" ]
