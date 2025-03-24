@@ -385,7 +385,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Ansible",
 		Type:    "action",
-		Version: "1.0.0",
+		Version: "1.0.1",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Ansible",

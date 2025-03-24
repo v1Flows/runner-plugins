@@ -5,7 +5,7 @@ go 1.24.0
 require (
 	github.com/hashicorp/go-plugin v1.6.3
 	github.com/prometheus-community/pro-bing v0.5.0
-	github.com/v1Flows/runner v1.0.1
+	github.com/v1Flows/runner v1.0.3
 	github.com/v1Flows/shared-library v1.0.7
 )
 
@@ -13,7 +13,7 @@ require (
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect
-	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
+	github.com/golang-jwt/jwt/v5 v5.2.2 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/hashicorp/go-hclog v1.6.3 // indirect
