@@ -371,7 +371,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "SSH",
 		Type:    "action",
-		Version: "1.1.2",
+		Version: "1.1.3",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "SSH",
