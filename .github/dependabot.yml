@@ -6,7 +6,9 @@
 version: 2
 updates:
   - package-ecosystem: "gomod" # See documentation for possible values
-    directory: "/" # Location of package manifests
+    directories:
+      - "/action-plugins/*/"
+      - "/endpoint-plugins/*/"
     schedule:
       interval: "weekly"
     labels:
