@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/rpc"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/v1Flows/runner/pkg/executions"
@@ -25,10 +26,11 @@ type Plugin struct{}
 
 func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Response, error) {
 	tf_version := ""
-	workdir := ""
+	workdir := request.Workspace
 	init := false
 	plan := false
 	plan_output := ""
+	plan_show := false
 	apply := false
 
 	for _, param := range request.Step.Action.Params {
@@ -36,7 +38,7 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 			tf_version = param.Value
 		}
 		if param.Key == "workdir" {
-			workdir = param.Value
+			workdir = workdir + "/" + param.Value
 		}
 		if param.Key == "init" {
 			init, _ = strconv.ParseBool(param.Value)
@@ -45,7 +47,36 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 			plan, _ = strconv.ParseBool(param.Value)
 		}
 		if param.Key == "plan_output" {
-			plan_output = param.Value
+
+			// if the file ends with .tf fail
+			if strings.HasSuffix(param.Value, ".tf") {
+				err := executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
+					ID: request.Step.ID,
+					Messages: []models.Message{
+						{
+							Title: "Terraform",
+							Lines: []models.Line{
+								{
+									Content: "Terraform Plan Output file cannot end with .tf",
+									Color:   "danger",
+								},
+							},
+						},
+					},
+					Status:     "error",
+					FinishedAt: time.Now(),
+				}, request.Platform)
+				if err != nil {
+					return plugins.Response{
+						Success: false,
+					}, err
+				}
+			}
+
+			plan_output = workdir + "/" + param.Value
+		}
+		if param.Key == "plan_show" {
+			plan_show, _ = strconv.ParseBool(param.Value)
 		}
 		if param.Key == "apply" {
 			apply, _ = strconv.ParseBool(param.Value)
@@ -78,7 +109,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 		Version: version.Must(version.NewVersion(tf_version)),
 	}
 
-	execPath, err := installer.Install(context.Background())
+	ctx := context.Background()
+
+	execPath, err := installer.Install(ctx)
 	if err != nil {
 		err := executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
 			ID: request.Step.ID,
@@ -106,6 +139,27 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 			}, err
 		}
 
+		return plugins.Response{
+			Success: false,
+		}, err
+	}
+
+	err = executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
+		ID: request.Step.ID,
+		Messages: []models.Message{
+			{
+				Title: "Terraform",
+				Lines: []models.Line{
+					{
+						Content: "Terraform Install completed",
+						Color:   "success",
+					},
+				},
+			},
+		},
+		Status: "running",
+	}, request.Platform)
+	if err != nil {
 		return plugins.Response{
 			Success: false,
 		}, err
@@ -144,8 +198,29 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 		}, err
 	}
 
+	err = executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
+		ID: request.Step.ID,
+		Messages: []models.Message{
+			{
+				Title: "Terraform",
+				Lines: []models.Line{
+					{
+						Content: "Terraform NewTerraform completed",
+						Color:   "success",
+					},
+				},
+			},
+		},
+		Status: "running",
+	}, request.Platform)
+	if err != nil {
+		return plugins.Response{
+			Success: false,
+		}, err
+	}
+
 	if init {
-		err = tf.Init(context.Background(), tfexec.Upgrade(true))
+		err = tf.Init(ctx, tfexec.Upgrade(false))
 		if err != nil {
 			err := executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
 				ID: request.Step.ID,
@@ -177,10 +252,31 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				Success: false,
 			}, err
 		}
+
+		err = executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
+			ID: request.Step.ID,
+			Messages: []models.Message{
+				{
+					Title: "Terraform",
+					Lines: []models.Line{
+						{
+							Content: "Terraform Init completed",
+							Color:   "success",
+						},
+					},
+				},
+			},
+			Status: "running",
+		}, request.Platform)
+		if err != nil {
+			return plugins.Response{
+				Success: false,
+			}, err
+		}
 	}
 
 	if plan {
-		diff, err := tf.Plan(context.Background(), tfexec.Out(plan_output))
+		diff, err := tf.Plan(ctx, tfexec.Out(plan_output))
 		if err != nil {
 			err := executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
 				ID: request.Step.ID,
@@ -234,6 +330,85 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					Success: false,
 				}, err
 			}
+
+			if plan_show {
+				plan, err := tf.ShowPlanFileRaw(ctx, plan_output)
+				if err != nil {
+					err := executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
+						ID: request.Step.ID,
+						Messages: []models.Message{
+							{
+								Title: "Terraform",
+								Lines: []models.Line{
+									{
+										Content: "Terraform Plan show failed",
+										Color:   "danger",
+									},
+									{
+										Content: "Plan output file: " + plan_output,
+										Color:   "danger",
+									},
+									{
+										Content: err.Error(),
+										Color:   "danger",
+									},
+								},
+							},
+						},
+						Status:     "error",
+						FinishedAt: time.Now(),
+					}, request.Platform)
+					if err != nil {
+						return plugins.Response{
+							Success: false,
+						}, err
+					}
+
+					return plugins.Response{
+						Success: false,
+					}, err
+				}
+
+				// Split the plan output by lines
+				lines := strings.Split(plan, "\n")
+				var messageLines []models.Line
+				for _, line := range lines {
+					color := "" // Default color
+					trimmedLine := strings.TrimSpace(line)
+					if strings.HasPrefix(trimmedLine, "+") {
+						color = "success" // Color for additions
+					} else if strings.HasPrefix(trimmedLine, "-") {
+						// Check if the line is a list item (e.g., starts with "- " or "-\t")
+						if strings.HasPrefix(trimmedLine, "- ") || strings.HasPrefix(trimmedLine, "-\t") {
+							color = "" // Neutral color for list items
+						} else {
+							color = "danger" // Color for deletions
+						}
+					}
+					messageLines = append(messageLines, models.Line{
+						Content: line,
+						Color:   color, // Assign the color
+					})
+				}
+
+				err = executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
+					ID: request.Step.ID,
+					Messages: []models.Message{
+						{
+							Title: "Terraform",
+							Lines: messageLines,
+						},
+					},
+					Status: "running",
+				}, request.Platform)
+				if err != nil {
+					return plugins.Response{
+						Success: false,
+					}, err
+				}
+
+			}
+
 		} else {
 			err := executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
 				ID: request.Step.ID,
@@ -288,7 +463,7 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 			}, err
 		}
 
-		err = tf.Apply(context.Background(), tfexec.DirOrPlan(plan_output))
+		err = tf.Apply(ctx, tfexec.DirOrPlan(plan_output))
 		if err != nil {
 			err := executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
 				ID: request.Step.ID,
@@ -320,6 +495,49 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				Success: false,
 			}, err
 		}
+
+		err = executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
+			ID: request.Step.ID,
+			Messages: []models.Message{
+				{
+					Title: "Terraform",
+					Lines: []models.Line{
+						{
+							Content: "Terraform Apply completed",
+							Color:   "success",
+						},
+					},
+				},
+			},
+			Status: "running",
+		}, request.Platform)
+		if err != nil {
+			return plugins.Response{
+				Success: false,
+			}, err
+		}
+	}
+
+	err = executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
+		ID: request.Step.ID,
+		Messages: []models.Message{
+			{
+				Title: "Terraform",
+				Lines: []models.Line{
+					{
+						Content: "Terraform Action completed",
+						Color:   "success",
+					},
+				},
+			},
+		},
+		Status:     "success",
+		FinishedAt: time.Now(),
+	}, request.Platform)
+	if err != nil {
+		return plugins.Response{
+			Success: false,
+		}, err
 	}
 
 	return plugins.Response{
@@ -349,7 +567,8 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 				{
 					Key:         "tf_version",
 					Title:       "Terraform Version",
-					Type:        "string",
+					Type:        "text",
+					Category:    "General",
 					Default:     "1.0.6",
 					Required:    true,
 					Description: "Terraform Version to use",
@@ -357,7 +576,8 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 				{
 					Key:         "workdir",
 					Title:       "Working Directory",
-					Type:        "string",
+					Type:        "text",
+					Category:    "General",
 					Default:     "",
 					Required:    true,
 					Description: "Working directory where terraform files are located. Default prefix is the runner workspace",
@@ -366,6 +586,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Key:         "init",
 					Title:       "Initialize",
 					Type:        "boolean",
+					Category:    "Init",
 					Default:     "false",
 					Required:    false,
 					Description: "Perform an terraform init",
@@ -374,6 +595,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Key:         "plan",
 					Title:       "Plan",
 					Type:        "boolean",
+					Category:    "Plan",
 					Default:     "false",
 					Required:    false,
 					Description: "Perform an terraform plan",
@@ -381,15 +603,26 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 				{
 					Key:         "plan_output",
 					Title:       "Plan Output",
-					Type:        "string",
+					Type:        "text",
+					Category:    "Plan",
 					Default:     "",
 					Required:    false,
-					Description: "Output the terraform plan to a file",
+					Description: "Output the terraform plan to a file. Default Prefix is the runner workspace",
+				},
+				{
+					Key:         "plan_show",
+					Title:       "Plan Show",
+					Type:        "boolean",
+					Category:    "Plan",
+					Default:     "false",
+					Required:    false,
+					Description: "Show the terraform plan output. Requires a plan_output file",
 				},
 				{
 					Key:         "Apply",
 					Type:        "boolean",
 					Default:     "false",
+					Category:    "Apply",
 					Required:    false,
 					Description: "Perform an terraform apply. Requires a plan_output file",
 				},
