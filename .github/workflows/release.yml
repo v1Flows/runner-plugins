@@ -62,7 +62,20 @@ jobs:
           VERSION=$(cat .version)
           echo "::set-output name=version::$VERSION"
 
+      - name: Check if Tag or Release Exists
+        id: check-tag-release
+        run: |
+          TAG_EXISTS=$(git ls-remote --tags origin | grep "refs/tags/${{ matrix.plugin-name }}-v${{ steps.read_version.outputs.version }}" || true)
+          RELEASE_EXISTS=$(gh release list --repo ${{ github.repository }} | grep "Release ${{ matrix.plugin-name }} v${{ steps.read_version.outputs.version }}" || true)
+          if [ -n "$TAG_EXISTS" ] || [ -n "$RELEASE_EXISTS" ]; then
+            echo "Tag or release already exists. Skipping job."
+            echo "::set-output name=skip::true"
+          else
+            echo "::set-output name=skip::false"
+          fi
+
       - name: Build Plugin
+        if: steps.check-tag-release.outputs.skip == 'false'
         working-directory: action-plugins/${{ matrix.plugin-name }}
         run: |
           GOOS=darwin GOARCH=amd64 go build -o ${{ matrix.plugin-name }}-v${{ steps.read_version.outputs.version }}-darwin-amd64
@@ -70,6 +83,7 @@ jobs:
           GOOS=linux GOARCH=amd64 go build -o ${{ matrix.plugin-name }}-v${{ steps.read_version.outputs.version }}-linux-amd64
 
       - name: Create Tag
+        if: steps.check-tag-release.outputs.skip == 'false'
         id: tag_version
         uses: mathieudutour/github-tag-action@v6.2
         with:
@@ -78,6 +92,7 @@ jobs:
           tag_prefix: ''
 
       - name: Create Release
+        if: steps.check-tag-release.outputs.skip == 'false'
         id: create_release
         uses: ncipollo/release-action@v1
         with:
@@ -111,7 +126,20 @@ jobs:
           VERSION=$(cat .version)
           echo "::set-output name=version::$VERSION"
 
+          - name: Check if Tag or Release Exists
+          id: check-tag-release
+          run: |
+            TAG_EXISTS=$(git ls-remote --tags origin | grep "refs/tags/${{ matrix.plugin-name }}-v${{ steps.read_version.outputs.version }}" || true)
+            RELEASE_EXISTS=$(gh release list --repo ${{ github.repository }} | grep "Release ${{ matrix.plugin-name }} v${{ steps.read_version.outputs.version }}" || true)
+            if [ -n "$TAG_EXISTS" ] || [ -n "$RELEASE_EXISTS" ]; then
+              echo "Tag or release already exists. Skipping job."
+              echo "::set-output name=skip::true"
+            else
+              echo "::set-output name=skip::false"
+            fi
+
       - name: Build Plugin
+        if: steps.check-tag-release.outputs.skip == 'false'
         working-directory: endpoint-plugins/${{ matrix.plugin-name }}
         run: |
           GOOS=darwin GOARCH=amd64 go build -o ${{ matrix.plugin-name }}-v${{ steps.read_version.outputs.version }}-darwin-amd64
@@ -119,6 +147,7 @@ jobs:
           GOOS=linux GOARCH=amd64 go build -o ${{ matrix.plugin-name }}-v${{ steps.read_version.outputs.version }}-linux-amd64
 
       - name: Create Tag
+        if: steps.check-tag-release.outputs.skip == 'false'
         id: tag_version
         uses: mathieudutour/github-tag-action@v6.2
         with:
@@ -127,6 +156,7 @@ jobs:
           tag_prefix: ''
 
       - name: Create Release
+        if: steps.check-tag-release.outputs.skip == 'false'
         id: create_release
         uses: ncipollo/release-action@v1
         with:
