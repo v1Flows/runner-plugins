@@ -123,24 +123,24 @@ jobs:
 
       - name: Read Plugin Version
         id: read_version
-        env:
-          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         working-directory: endpoint-plugins/${{ matrix.plugin-name }}
         run: |
           VERSION=$(cat .version)
           echo "::set-output name=version::$VERSION"
 
-          - name: Check if Tag or Release Exists
-          id: check-tag-release
-          run: |
-            TAG_EXISTS=$(git ls-remote --tags origin | grep "refs/tags/${{ matrix.plugin-name }}-v${{ steps.read_version.outputs.version }}" || true)
-            RELEASE_EXISTS=$(gh release list --repo ${{ github.repository }} | grep "Release ${{ matrix.plugin-name }} v${{ steps.read_version.outputs.version }}" || true)
-            if [ -n "$TAG_EXISTS" ] || [ -n "$RELEASE_EXISTS" ]; then
-              echo "Tag or release already exists. Skipping job."
-              echo "::set-output name=skip::true"
-            else
-              echo "::set-output name=skip::false"
-            fi
+      - name: Check if Tag or Release Exists
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        id: check-tag-release
+        run: |
+          TAG_EXISTS=$(git ls-remote --tags origin | grep "refs/tags/${{ matrix.plugin-name }}-v${{ steps.read_version.outputs.version }}" || true)
+          RELEASE_EXISTS=$(gh release list --repo ${{ github.repository }} | grep "Release ${{ matrix.plugin-name }} v${{ steps.read_version.outputs.version }}" || true)
+          if [ -n "$TAG_EXISTS" ] || [ -n "$RELEASE_EXISTS" ]; then
+            echo "Tag or release already exists. Skipping job."
+            echo "::set-output name=skip::true"
+          else
+            echo "::set-output name=skip::false"
+          fi
 
       - name: Build Plugin
         if: steps.check-tag-release.outputs.skip == 'false'
