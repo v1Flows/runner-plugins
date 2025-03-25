@@ -64,6 +64,8 @@ jobs:
 
       - name: Check if Tag or Release Exists
         id: check-tag-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         run: |
           TAG_EXISTS=$(git ls-remote --tags origin | grep "refs/tags/${{ matrix.plugin-name }}-v${{ steps.read_version.outputs.version }}" || true)
           RELEASE_EXISTS=$(gh release list --repo ${{ github.repository }} | grep "Release ${{ matrix.plugin-name }} v${{ steps.read_version.outputs.version }}" || true)
@@ -121,6 +123,8 @@ jobs:
 
       - name: Read Plugin Version
         id: read_version
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         working-directory: endpoint-plugins/${{ matrix.plugin-name }}
         run: |
           VERSION=$(cat .version)
