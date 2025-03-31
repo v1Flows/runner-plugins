@@ -83,7 +83,7 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 			}, err
 		}
 		return plugins.Response{
-			Success: true,
+			Success: false,
 		}, nil
 	} else {
 		if conn != nil {
@@ -132,7 +132,7 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				}, err
 			}
 			return plugins.Response{
-				Success: true,
+				Success: false,
 			}, nil
 		}
 	}
@@ -174,7 +174,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Port Checker",
 		Type:    "action",
-		Version: "1.2.3",
+		Version: "1.2.4",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Port Checker",
