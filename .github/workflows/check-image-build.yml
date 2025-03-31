@@ -24,9 +24,9 @@ jobs:
         run: |
           PLUGINS=$(find action-plugins -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | jq -R -s -c 'split("\n")[:-1]')
           if [ -z "$PLUGINS" ]; then
-            echo "::set-output name=plugins::[]"
+            echo "plugins=[]" >> $GITHUB_OUTPUT
           else
-            echo "::set-output name=plugins::$PLUGINS"
+            echo "plugins=$PLUGINS" >> $GITHUB_OUTPUT
           fi
 
       - name: List Endpoint Plugins
@@ -34,9 +34,9 @@ jobs:
         run: |
           PLUGINS=$(find endpoint-plugins -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | jq -R -s -c 'split("\n")[:-1]')
           if [ -z "$PLUGINS" ]; then
-            echo "::set-output name=plugins::[]"
+            echo "plugins=[]" >> $GITHUB_OUTPUT
           else
-            echo "::set-output name=plugins::$PLUGINS"
+            echo "plugins=$PLUGINS" >> $GITHUB_OUTPUT
           fi
 
       - name: Debug Plugins
