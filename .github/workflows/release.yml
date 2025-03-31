@@ -19,9 +19,9 @@ jobs:
         run: |
           PLUGINS=$(find action-plugins -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | jq -R -s -c 'split("\n")[:-1]')
           if [ -z "$PLUGINS" ]; then
-            echo "::set-output name=plugins::[]"
+            echo "plugins=[]" >> $GITHUB_OUTPUT
           else
-            echo "::set-output name=plugins::$PLUGINS"
+            echo "plugins=$PLUGINS" >> $GITHUB_OUTPUT
           fi
 
       - name: List Endpoint Plugins
@@ -29,9 +29,9 @@ jobs:
         run: |
           PLUGINS=$(find endpoint-plugins -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | jq -R -s -c 'split("\n")[:-1]')
           if [ -z "$PLUGINS" ]; then
-            echo "::set-output name=plugins::[]"
+            echo "plugins=[]" >> $GITHUB_OUTPUT
           else
-            echo "::set-output name=plugins::$PLUGINS"
+            echo "plugins=$PLUGINS" >> $GITHUB_OUTPUT
           fi
 
       - name: Debug Plugins
@@ -55,7 +55,7 @@ jobs:
         working-directory: action-plugins/${{ matrix.plugin-name }}
         run: |
           VERSION=$(cat .version)
-          echo "::set-output name=version::$VERSION"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Check if Tag or Release Exists
         id: check-tag-release
@@ -65,10 +65,9 @@ jobs:
           TAG_EXISTS=$(git ls-remote --tags origin | grep "refs/tags/${{ matrix.plugin-name }}-v${{ steps.read_version.outputs.version }}" || true)
           RELEASE_EXISTS=$(gh release list --repo ${{ github.repository }} | grep "Release ${{ matrix.plugin-name }} v${{ steps.read_version.outputs.version }}" || true)
           if [ -n "$TAG_EXISTS" ] || [ -n "$RELEASE_EXISTS" ]; then
-            echo "Tag or release already exists. Skipping job."
-            echo "::set-output name=skip::true"
+            echo "skip=true" >> $GITHUB_OUTPUT
           else
-            echo "::set-output name=skip::false"
+            echo "skip=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Setup Go
@@ -121,7 +120,7 @@ jobs:
         working-directory: endpoint-plugins/${{ matrix.plugin-name }}
         run: |
           VERSION=$(cat .version)
-          echo "::set-output name=version::$VERSION"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Check if Tag or Release Exists
         env:
@@ -131,10 +130,9 @@ jobs:
           TAG_EXISTS=$(git ls-remote --tags origin | grep "refs/tags/${{ matrix.plugin-name }}-v${{ steps.read_version.outputs.version }}" || true)
           RELEASE_EXISTS=$(gh release list --repo ${{ github.repository }} | grep "Release ${{ matrix.plugin-name }} v${{ steps.read_version.outputs.version }}" || true)
           if [ -n "$TAG_EXISTS" ] || [ -n "$RELEASE_EXISTS" ]; then
-            echo "Tag or release already exists. Skipping job."
-            echo "::set-output name=skip::true"
+            echo "skip=true" >> $GITHUB_OUTPUT
           else
-            echo "::set-output name=skip::false"
+            echo "skip=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Setup Go
