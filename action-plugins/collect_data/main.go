@@ -308,13 +308,13 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Collect Data",
 		Type:    "action",
-		Version: "1.2.5",
+		Version: "1.2.6",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Collect Data",
-			Description: "Collects Flow and Alert data from AlertFlow",
+			Description: "Collects Flow and Alert data from AlertFlow or exFlow",
 			Plugin:      "collect_data",
-			Icon:        "solar:inbox-archive-linear",
+			Icon:        "hugeicons:package-receive",
 			Category:    "Data",
 			Params: []models.Params{
 				{
@@ -323,6 +323,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "false",
 					Required:    false,
 					Description: "Show collected data in the output messages",
+					Category:    "General",
 				},
 				{
 					Key:         "FlowID",
@@ -330,6 +331,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "00000000-0000-0000-0000-00000000",
 					Required:    true,
 					Description: "The Flow ID to collect data from",
+					Category:    "General",
 				},
 				{
 					Key:         "AlertID",
@@ -337,6 +339,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "00000000-0000-0000-0000-00000000",
 					Required:    false,
 					Description: "The Alert ID to collect data from. Required for AlertFlow platform",
+					Category:    "General",
 				},
 			},
 		},
