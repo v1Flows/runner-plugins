@@ -100,7 +100,7 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 	for _, param := range request.Step.Action.Params {
 		if param.Key == "playbook" {
 			if strings.Contains(param.Value, "/") {
-				play = request.Workspace + "/" + param.Value
+				play = request.Workspace + param.Value
 			} else {
 				play = param.Value
 			}
@@ -108,7 +108,7 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 		if param.Key == "inventory" {
 			// if inventory is a path prefix with workspace
 			if strings.Contains(param.Value, "/") {
-				inventory = request.Workspace + "/" + param.Value
+				inventory = request.Workspace + param.Value
 			} else {
 				inventory = param.Value
 			}
@@ -385,7 +385,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Ansible",
 		Type:    "action",
-		Version: "1.0.1",
+		Version: "1.0.2",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Ansible",
@@ -401,7 +401,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Type:        "text",
 					Default:     "",
 					Required:    true,
-					Description: "Path to the playbook file",
+					Description: "Path to the playbook file. The path prefix is the workspace directory: " + request.Workspace,
 				},
 				{
 					Key:         "inventory",
@@ -410,7 +410,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Type:        "text",
 					Default:     "",
 					Required:    true,
-					Description: "Path to the inventory file or comma separated host list",
+					Description: "Path to the inventory file or comma separated host list. The path prefix is the workspace directory: " + request.Workspace,
 				},
 				{
 					Key:         "user",
