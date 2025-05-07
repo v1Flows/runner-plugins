@@ -143,7 +143,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Mail",
 		Type:    "action",
-		Version: "1.2.3",
+		Version: "1.2.4",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Mail",
@@ -158,6 +158,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "from@mail.com",
 					Required:    true,
 					Description: "Sender email address",
+					Options:     nil,
 				},
 				{
 					Key:         "Password",
@@ -165,6 +166,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "***",
 					Required:    false,
 					Description: "Sender email password",
+					Options:     nil,
 				},
 				{
 					Key:         "To",
@@ -172,6 +174,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "to@mail.com",
 					Required:    false,
 					Description: "Recipient email address. Multiple emails can be separated by comma",
+					Options:     nil,
 				},
 				{
 					Key:         "SmtpHost",
@@ -179,6 +182,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "smtp.mail.com",
 					Required:    true,
 					Description: "SMTP server host",
+					Options:     nil,
 				},
 				{
 					Key:         "SmtpPort",
@@ -186,6 +190,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "587",
 					Required:    true,
 					Description: "SMTP server port",
+					Options:     nil,
 				},
 				{
 					Key:         "Message",
@@ -193,6 +198,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "Email message",
 					Required:    true,
 					Description: "Email message",
+					Options:     nil,
 				},
 			},
 		},

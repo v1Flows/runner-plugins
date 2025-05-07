@@ -93,7 +93,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Log",
 		Type:    "action",
-		Version: "1.2.3",
+		Version: "1.2.4",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Log Message",
@@ -108,6 +108,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "",
 					Required:    false,
 					Description: "Additional message to log. To use the alert payload data, use 'payload.<key>'",
+					Options:     nil,
 				},
 			},
 		},
