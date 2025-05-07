@@ -120,6 +120,7 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					Lines: []models.Line{
 						{
 							Content: "Step not found",
+							Color:   "danger",
 						},
 					},
 				},
@@ -605,7 +606,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Step Analysis",
 		Type:    "action",
-		Version: "1.0.0",
+		Version: "1.0.1",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Step Analysis",

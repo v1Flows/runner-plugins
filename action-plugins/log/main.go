@@ -23,7 +23,7 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 	additionalMessage := ""
 
 	for _, param := range request.Step.Action.Params {
-		if param.Key == "AdditionalMessage" {
+		if param.Key == "additionalMessage" {
 			additionalMessage = param.Value
 		}
 	}
@@ -64,6 +64,7 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					},
 					{
 						Content: "Log Action finished",
+						Color:   "success",
 					},
 				},
 			},
@@ -93,22 +94,22 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Log",
 		Type:    "action",
-		Version: "1.2.4",
+		Version: "1.2.5",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Log Message",
 			Description: "Logs a message in action messages",
 			Plugin:      "log",
-			Icon:        "solar:clipboard-list-broken",
+			Icon:        "hugeicons:files-01",
 			Category:    "Utility",
 			Params: []models.Params{
 				{
-					Key:         "AdditionalMessage",
+					Key:         "additionalMessage",
+					Title:       "Additional Message",
 					Type:        "text",
 					Default:     "",
 					Required:    false,
 					Description: "Additional message to log. To use the alert payload data, use 'payload.<key>'",
-					Options:     nil,
 				},
 			},
 		},
