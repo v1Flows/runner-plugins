@@ -183,7 +183,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Ping",
 		Type:    "action",
-		Version: "1.2.3",
+		Version: "1.2.4",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Ping",
@@ -198,6 +198,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "www.alertflow.org",
 					Required:    true,
 					Description: "The target to ping",
+					Options:     nil,
 				},
 				{
 					Key:         "Count",
@@ -205,6 +206,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "3",
 					Required:    false,
 					Description: "Number of packets to send",
+					Options:     nil,
 				},
 			},
 		},

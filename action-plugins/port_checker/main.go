@@ -174,7 +174,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Port Checker",
 		Type:    "action",
-		Version: "1.2.4",
+		Version: "1.2.5",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Port Checker",
@@ -189,6 +189,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "myhost",
 					Required:    true,
 					Description: "The host to check for the port",
+					Options:     nil,
 				},
 				{
 					Key:         "Port",
@@ -196,6 +197,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "22",
 					Required:    true,
 					Description: "The port to check",
+					Options:     nil,
 				},
 				{
 					Key:         "Timeout",
@@ -203,6 +205,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "3",
 					Required:    false,
 					Description: "Timeout in seconds",
+					Options:     nil,
 				},
 			},
 		},

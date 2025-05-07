@@ -371,7 +371,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "SSH",
 		Type:    "action",
-		Version: "1.1.3",
+		Version: "1.1.4",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "SSH",
@@ -386,6 +386,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "",
 					Required:    true,
 					Description: "The target server IP address or hostname",
+					Options:     nil,
 				},
 				{
 					Key:         "Port",
@@ -393,6 +394,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "22",
 					Required:    true,
 					Description: "The target server port",
+					Options:     nil,
 				},
 				{
 					Key:         "Username",
@@ -400,6 +402,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "",
 					Required:    true,
 					Description: "The username to authenticate with",
+					Options:     nil,
 				},
 				{
 					Key:         "Password",
@@ -407,6 +410,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "",
 					Required:    false,
 					Description: "The password to authenticate with",
+					Options:     nil,
 				},
 				{
 					Key:         "PrivateKeyFile",
@@ -414,6 +418,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "",
 					Required:    false,
 					Description: "The private key file path to authenticate with. This path must be accessible by the runner",
+					Options:     nil,
 				},
 				{
 					Key:         "PrivateKeyFilePassword",
@@ -421,6 +426,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "",
 					Required:    false,
 					Description: "The password to decrypt the private key file",
+					Options:     nil,
 				},
 				{
 					Key:         "Sudo",
@@ -428,6 +434,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "true",
 					Required:    false,
 					Description: "Use sudo to execute the commands",
+					Options:     nil,
 				},
 				{
 					Key:         "SudoPassword",
@@ -435,6 +442,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "",
 					Required:    false,
 					Description: "The password to authenticate with sudo",
+					Options:     nil,
 				},
 				{
 					Key:         "UseSSHAgent",
@@ -442,6 +450,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "false",
 					Required:    false,
 					Description: "Use the SSH agent to authenticate",
+					Options:     nil,
 				},
 				{
 					Key:         "Commands",
@@ -449,6 +458,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "",
 					Required:    true,
 					Description: "The commands to execute on the remote server. Each command should be on a new line",
+					Options:     nil,
 				},
 			},
 		},

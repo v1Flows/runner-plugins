@@ -190,7 +190,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Interaction",
 		Type:    "action",
-		Version: "1.2.3",
+		Version: "1.2.4",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Interaction",
@@ -205,6 +205,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "0",
 					Required:    true,
 					Description: "Continue to the next step after the specified time (in seconds). 0 to disable",
+					Options:     nil,
 				},
 			},
 		},
