@@ -22,12 +22,17 @@ type Plugin struct{}
 func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Response, error) {
 	target := "www.alertflow.org"
 	count := 3
+	maxLostPackages := 0
+
 	for _, param := range request.Step.Action.Params {
-		if param.Key == "Target" {
+		if param.Key == "target" {
 			target = param.Value
 		}
-		if param.Key == "Count" {
+		if param.Key == "count" {
 			count, _ = strconv.Atoi(param.Value)
+		}
+		if param.Key == "maxLostPackages" {
+			maxLostPackages, _ = strconv.Atoi(param.Value)
 		}
 	}
 
@@ -141,7 +146,7 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 						Content: "Received: " + strconv.Itoa(stats.PacketsRecv),
 					},
 					{
-						Content: "Lost: " + strconv.Itoa(int(stats.PacketLoss)),
+						Content: "Lost: " + strconv.Itoa(int(stats.PacketLoss)) + "%",
 					},
 					{
 						Content: "RTT min: " + stats.MinRtt.String(),
@@ -152,8 +157,52 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					{
 						Content: "RTT avg: " + stats.AvgRtt.String(),
 					},
+				},
+			},
+		},
+	}, request.Platform)
+	if err != nil {
+		return plugins.Response{
+			Success: false,
+		}, err
+	}
+
+	if stats.PacketLoss > float64(maxLostPackages) {
+		err = executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
+			ID: request.Step.ID,
+			Messages: []models.Message{
+				{
+					Title: "Ping",
+					Lines: []models.Line{
+						{
+							Content: "Number of lost packages is greater than the maximum allowed",
+							Color:   "danger",
+						},
+					},
+				},
+			},
+			Status:     "error",
+			FinishedAt: time.Now(),
+		}, request.Platform)
+		if err != nil {
+			return plugins.Response{
+				Success: false,
+			}, err
+		}
+
+		return plugins.Response{
+			Success: false,
+		}, nil
+	}
+
+	err = executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
+		ID: request.Step.ID,
+		Messages: []models.Message{
+			{
+				Title: "Ping",
+				Lines: []models.Line{
 					{
-						Content: "Ping finished",
+						Content: "Ping completed successfully",
 						Color:   "success",
 					},
 				},
@@ -183,30 +232,41 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Ping",
 		Type:    "action",
-		Version: "1.2.4",
+		Version: "1.3.0",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Ping",
 			Description: "Ping an remote target",
 			Plugin:      "ping",
-			Icon:        "solar:wi-fi-router-minimalistic-broken",
+			Icon:        "hugeicons:router-01",
 			Category:    "Network",
 			Params: []models.Params{
 				{
-					Key:         "Target",
+					Key:         "target",
+					Title:       "Target",
 					Type:        "text",
 					Default:     "www.alertflow.org",
 					Required:    true,
 					Description: "The target to ping",
-					Options:     nil,
+					Category:    "General",
 				},
 				{
-					Key:         "Count",
+					Key:         "count",
+					Title:       "Count",
 					Type:        "number",
 					Default:     "3",
 					Required:    false,
-					Description: "Number of packets to send",
-					Options:     nil,
+					Description: "Number of packages to send",
+					Category:    "General",
+				},
+				{
+					Key:         "maxLostPackages",
+					Title:       "Max Lost Packages",
+					Type:        "number",
+					Default:     "0",
+					Required:    false,
+					Description: "Max lost packages to consider the ping failed",
+					Category:    "General",
 				},
 			},
 		},
