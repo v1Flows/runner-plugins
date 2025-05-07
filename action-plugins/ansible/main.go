@@ -100,7 +100,7 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 	for _, param := range request.Step.Action.Params {
 		if param.Key == "playbook" {
 			if strings.Contains(param.Value, "/") {
-				play = request.Workspace + "/" + param.Value
+				play = request.Workspace + param.Value
 			} else {
 				play = param.Value
 			}
@@ -108,7 +108,7 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 		if param.Key == "inventory" {
 			// if inventory is a path prefix with workspace
 			if strings.Contains(param.Value, "/") {
-				inventory = request.Workspace + "/" + param.Value
+				inventory = request.Workspace + param.Value
 			} else {
 				inventory = param.Value
 			}
@@ -385,7 +385,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Ansible",
 		Type:    "action",
-		Version: "1.0.1",
+		Version: "1.0.3",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Ansible",
@@ -401,7 +401,8 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Type:        "text",
 					Default:     "",
 					Required:    true,
-					Description: "Path to the playbook file",
+					Description: "Path to the playbook file. The path prefix is the workspace directory: " + request.Workspace,
+					Options:     nil,
 				},
 				{
 					Key:         "inventory",
@@ -410,7 +411,8 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Type:        "text",
 					Default:     "",
 					Required:    true,
-					Description: "Path to the inventory file or comma separated host list",
+					Description: "Path to the inventory file or comma separated host list. The path prefix is the workspace directory: " + request.Workspace,
+					Options:     nil,
 				},
 				{
 					Key:         "user",
@@ -420,6 +422,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "",
 					Required:    false,
 					Description: "Connect as this user",
+					Options:     nil,
 				},
 				{
 					Key:         "password",
@@ -429,6 +432,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "",
 					Required:    false,
 					Description: "Connection user password",
+					Options:     nil,
 				},
 				{
 					Key:         "private_key",
@@ -438,6 +442,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "",
 					Required:    false,
 					Description: "Path to the private key file",
+					Options:     nil,
 				},
 				{
 					Key:         "limit",
@@ -447,6 +452,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "",
 					Required:    false,
 					Description: "Further limit selected hosts to an additional pattern",
+					Options:     nil,
 				},
 				{
 					Key:         "become",
@@ -456,6 +462,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "false",
 					Required:    false,
 					Description: "Run playbook with become",
+					Options:     nil,
 				},
 				{
 					Key:         "become_user",
@@ -465,6 +472,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "root",
 					Required:    false,
 					Description: "User to run become tasks with",
+					Options:     nil,
 				},
 				{
 					Key:         "become_pass",
@@ -474,6 +482,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "",
 					Required:    false,
 					Description: "Become user password",
+					Options:     nil,
 				},
 				{
 					Key:         "check",
@@ -483,6 +492,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "false",
 					Required:    false,
 					Description: "Don't make any changes; instead, try to predict some of the changes that may occur",
+					Options:     nil,
 				},
 				{
 					Key:         "diff",
@@ -492,6 +502,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "false",
 					Required:    false,
 					Description: "When changing (small) files and templates, show the differences in those files",
+					Options:     nil,
 				},
 				{
 					Key:         "verbose",
@@ -501,6 +512,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "0",
 					Required:    false,
 					Description: "Set the verbosity level. Default is 0",
+					Options:     nil,
 				},
 			},
 		},

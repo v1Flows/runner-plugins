@@ -308,7 +308,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Collect Data",
 		Type:    "action",
-		Version: "1.2.6",
+		Version: "1.2.7",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Collect Data",
@@ -324,6 +324,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Required:    false,
 					Description: "Show collected data in the output messages",
 					Category:    "General",
+					Options:     nil,
 				},
 				{
 					Key:         "FlowID",
@@ -332,6 +333,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Required:    true,
 					Description: "The Flow ID to collect data from",
 					Category:    "General",
+					Options:     nil,
 				},
 				{
 					Key:         "AlertID",
@@ -340,6 +342,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Required:    false,
 					Description: "The Alert ID to collect data from. Required for AlertFlow platform",
 					Category:    "General",
+					Options:     nil,
 				},
 			},
 		},
