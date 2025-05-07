@@ -11,7 +11,7 @@ updates:
     groups:
       action-plugins:
         patterns:
-          - "/action-plugins/*/"
+          - "action-plugins/*/"
       endpoint-plugins:
         patterns:
-          - "/endpoint-plugins/*/"
+          - "endpoint-plugins/*/"
