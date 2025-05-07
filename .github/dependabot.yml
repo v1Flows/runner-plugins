@@ -1,17 +1,114 @@
 version: 2
 updates:
-  - package-ecosystem: "gomod" # Specify the package manager
-    directory: "/" # Root directory or specific path
+  - package-ecosystem: "gomod"
+    directory: "./action-plugins/step_analysis"
     schedule:
       interval: "weekly"
     labels:
       - "dependencies"
     open-pull-requests-limit: 5
     target-branch: "develop"
-    groups:
-      action-plugins:
-        patterns:
-          - "action-plugins/*/"
-      endpoint-plugins:
-        patterns:
-          - "endpoint-plugins/*/"
+  - package-ecosystem: "gomod"
+    directory: "./action-plugins/wait"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 5
+    target-branch: "develop"
+  - package-ecosystem: "gomod"
+    directory: "./action-plugins/actions_check"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 5
+    target-branch: "develop"
+  - package-ecosystem: "gomod"
+    directory: "./action-plugins/ping"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 5
+    target-branch: "develop"
+  - package-ecosystem: "gomod"
+    directory: "./action-plugins/pattern_check"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 5
+    target-branch: "develop"
+  - package-ecosystem: "gomod"
+    directory: "./action-plugins/mail"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 5
+    target-branch: "develop"
+  - package-ecosystem: "gomod"
+    directory: "./action-plugins/ansible"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 5
+    target-branch: "develop"
+  - package-ecosystem: "gomod"
+    directory: "./action-plugins/ssh"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 5
+    target-branch: "develop"
+  - package-ecosystem: "gomod"
+    directory: "./action-plugins/port_checker"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 5
+    target-branch: "develop"
+  - package-ecosystem: "gomod"
+    directory: "./action-plugins/log"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 5
+    target-branch: "develop"
+  - package-ecosystem: "gomod"
+    directory: "./action-plugins/interaction"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 5
+    target-branch: "develop"
+  - package-ecosystem: "gomod"
+    directory: "./action-plugins/git"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 5
+    target-branch: "develop"
+  - package-ecosystem: "gomod"
+    directory: "./action-plugins/collect_data"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 5
+    target-branch: "develop"
+  - package-ecosystem: "gomod"
+    directory: "./endpoint-plugins/alertmanager"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 5
+    target-branch: "develop"
