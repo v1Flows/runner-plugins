@@ -21,3 +21,4 @@ vendor/
 # Go workspace file
 go.work
 
+action-plugins/test
