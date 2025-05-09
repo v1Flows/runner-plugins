@@ -307,6 +307,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 								Content:   "-------------------------",
 								Timestamp: time.Now(),
 							},
+							{
+								Content: "-------------------------",
+							},
 						},
 					},
 				},
