@@ -55,7 +55,8 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				Title: "Mail",
 				Lines: []models.Line{
 					{
-						Content: `Authenticate on SMTP Server: ` + smtpHost + `:` + strconv.Itoa(smtpPort),
+						Content:   `Authenticate on SMTP Server: ` + smtpHost + `:` + strconv.Itoa(smtpPort),
+						Timestamp: time.Now(),
 					},
 				},
 			},
@@ -82,12 +83,14 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					Title: "Mail",
 					Lines: []models.Line{
 						{
-							Content: "Failed to send email",
-							Color:   "danger",
+							Content:   "Failed to send email",
+							Color:     "danger",
+							Timestamp: time.Now(),
 						},
 						{
-							Content: err.Error(),
-							Color:   "danger",
+							Content:   err.Error(),
+							Color:     "danger",
+							Timestamp: time.Now(),
 						},
 					},
 				},
@@ -113,8 +116,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				Title: "Mail",
 				Lines: []models.Line{
 					{
-						Content: `Email sent to ` + strings.Join(to, ", "),
-						Color:   "success",
+						Content:   `Email sent to ` + strings.Join(to, ", "),
+						Color:     "success",
+						Timestamp: time.Now(),
 					},
 				},
 			},
@@ -143,13 +147,13 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Mail",
 		Type:    "action",
-		Version: "1.2.4",
+		Version: "1.3.0",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Mail",
 			Description: "Send an email",
 			Plugin:      "mail",
-			Icon:        "solar:mailbox-linear",
+			Icon:        "hugeicons:mail-02",
 			Category:    "Utility",
 			Params: []models.Params{
 				{
@@ -158,15 +162,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "from@mail.com",
 					Required:    true,
 					Description: "Sender email address",
-					Options:     nil,
-				},
-				{
-					Key:         "Password",
-					Type:        "password",
-					Default:     "***",
-					Required:    false,
-					Description: "Sender email password",
-					Options:     nil,
+					Category:    "General",
 				},
 				{
 					Key:         "To",
@@ -174,7 +170,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "to@mail.com",
 					Required:    false,
 					Description: "Recipient email address. Multiple emails can be separated by comma",
-					Options:     nil,
+					Category:    "General",
 				},
 				{
 					Key:         "SmtpHost",
@@ -182,7 +178,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "smtp.mail.com",
 					Required:    true,
 					Description: "SMTP server host",
-					Options:     nil,
+					Category:    "SMTP",
 				},
 				{
 					Key:         "SmtpPort",
@@ -191,6 +187,16 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Required:    true,
 					Description: "SMTP server port",
 					Options:     nil,
+					Category:    "SMTP",
+				},
+				{
+					Key:         "Password",
+					Type:        "password",
+					Default:     "***",
+					Required:    false,
+					Description: "Sender email password",
+					Options:     nil,
+					Category:    "Credentials",
 				},
 				{
 					Key:         "Message",

@@ -41,10 +41,12 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				Title: "Port Check",
 				Lines: []models.Line{
 					{
-						Content: "Checking port " + strconv.Itoa(port) + " on " + host,
+						Content:   "Checking port " + strconv.Itoa(port) + " on " + host,
+						Timestamp: time.Now(),
 					},
 					{
-						Content: "Timeout: " + strconv.Itoa(timeout) + " seconds",
+						Content:   "Timeout: " + strconv.Itoa(timeout) + " seconds",
+						Timestamp: time.Now(),
 					},
 				},
 			},
@@ -68,8 +70,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					Title: "Port Check",
 					Lines: []models.Line{
 						{
-							Content: "Port is closed",
-							Color:   "danger",
+							Content:   "Port is closed",
+							Color:     "danger",
+							Timestamp: time.Now(),
 						},
 					},
 				},
@@ -94,8 +97,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 						Title: "Port Check",
 						Lines: []models.Line{
 							{
-								Content: "Port is open",
-								Color:   "success",
+								Content:   "Port is open",
+								Color:     "success",
+								Timestamp: time.Now(),
 							},
 						},
 					},
@@ -117,8 +121,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 						Title: "Port Check",
 						Lines: []models.Line{
 							{
-								Content: "Port is closed",
-								Color:   "danger",
+								Content:   "Port is closed",
+								Color:     "danger",
+								Timestamp: time.Now(),
 							},
 						},
 					},
@@ -144,8 +149,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				Title: "Port Check",
 				Lines: []models.Line{
 					{
-						Content: "Port check finished",
-						Color:   "success",
+						Content:   "Port check finished",
+						Color:     "success",
+						Timestamp: time.Now(),
 					},
 				},
 			},
@@ -174,13 +180,13 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Port Checker",
 		Type:    "action",
-		Version: "1.2.5",
+		Version: "1.3.0",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Port Checker",
 			Description: "Checks if a port is open",
 			Plugin:      "port_checker",
-			Icon:        "solar:wi-fi-router-broken",
+			Icon:        "hugeicons:internet-antenna-04",
 			Category:    "Network",
 			Params: []models.Params{
 				{
@@ -189,7 +195,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "myhost",
 					Required:    true,
 					Description: "The host to check for the port",
-					Options:     nil,
+					Category:    "General",
 				},
 				{
 					Key:         "Port",
@@ -197,7 +203,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "22",
 					Required:    true,
 					Description: "The port to check",
-					Options:     nil,
+					Category:    "General",
 				},
 				{
 					Key:         "Timeout",
@@ -205,7 +211,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "3",
 					Required:    false,
 					Description: "Timeout in seconds",
-					Options:     nil,
+					Category:    "General",
 				},
 			},
 		},

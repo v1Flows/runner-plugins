@@ -32,11 +32,13 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				Title: "Interaction",
 				Lines: []models.Line{
 					{
-						Content: "Waiting for user interaction",
-						Color:   "primary",
+						Content:   "Waiting for user interaction",
+						Color:     "primary",
+						Timestamp: time.Now(),
 					},
 					{
-						Content: "Timeout: " + strconv.Itoa(timeout) + " seconds",
+						Content:   "Timeout: " + strconv.Itoa(timeout) + " seconds",
+						Timestamp: time.Now(),
 					},
 				},
 			},
@@ -80,12 +82,14 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 						Title: "Interaction",
 						Lines: []models.Line{
 							{
-								Content: "Interaction timed out",
-								Color:   "warning",
+								Content:   "Interaction timed out",
+								Color:     "warning",
+								Timestamp: time.Now(),
 							},
 							{
-								Content: "Automatically approved & continuing to the next step",
-								Color:   "success",
+								Content:   "Automatically approved & continuing to the next step",
+								Color:     "success",
+								Timestamp: time.Now(),
 							},
 						},
 					},
@@ -118,12 +122,14 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					Title: "Interaction",
 					Lines: []models.Line{
 						{
-							Content: "Interaction rejected",
-							Color:   "danger",
+							Content:   "Interaction rejected",
+							Color:     "danger",
+							Timestamp: time.Now(),
 						},
 						{
-							Content: "Execution canceled",
-							Color:   "danger",
+							Content:   "Execution canceled",
+							Color:     "danger",
+							Timestamp: time.Now(),
 						},
 					},
 				},
@@ -153,8 +159,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					Title: "Interaction",
 					Lines: []models.Line{
 						{
-							Content: "Interaction approved",
-							Color:   "success",
+							Content:   "Interaction approved",
+							Color:     "success",
+							Timestamp: time.Now(),
 						},
 					},
 				},
@@ -190,13 +197,13 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Interaction",
 		Type:    "action",
-		Version: "1.2.4",
+		Version: "1.3.0",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Interaction",
 			Description: "Wait for user interaction to continue",
 			Plugin:      "interaction",
-			Icon:        "solar:hand-shake-linear",
+			Icon:        "hugeicons:waving-hand-01",
 			Category:    "Utility",
 			Params: []models.Params{
 				{
@@ -205,7 +212,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "0",
 					Required:    true,
 					Description: "Continue to the next step after the specified time (in seconds). 0 to disable",
-					Options:     nil,
+					Category:    "General",
 				},
 			},
 		},

@@ -70,7 +70,8 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				Title: "Git",
 				Lines: []models.Line{
 					{
-						Content: "Cloning repository " + url + " to " + directory,
+						Content:   "Cloning repository " + url + " to " + directory,
+						Timestamp: time.Now(),
 					},
 				},
 			},
@@ -114,12 +115,14 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 						Title: "Git",
 						Lines: []models.Line{
 							{
-								Content: "Error cloning repository",
-								Color:   "danger",
+								Content:   "Error cloning repository",
+								Color:     "danger",
+								Timestamp: time.Now(),
 							},
 							{
-								Content: err.Error(),
-								Color:   "danger",
+								Content:   err.Error(),
+								Color:     "danger",
+								Timestamp: time.Now(),
 							},
 						},
 					},
@@ -148,12 +151,14 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 						Title: "Git",
 						Lines: []models.Line{
 							{
-								Content: "Error cloning repository",
-								Color:   "danger",
+								Content:   "Error cloning repository",
+								Color:     "danger",
+								Timestamp: time.Now(),
 							},
 							{
-								Content: "Private key file does not exist",
-								Color:   "danger",
+								Content:   "Private key file does not exist",
+								Color:     "danger",
+								Timestamp: time.Now(),
 							},
 						},
 					},
@@ -180,12 +185,14 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 						Title: "Git",
 						Lines: []models.Line{
 							{
-								Content: "Error cloning repository",
-								Color:   "danger",
+								Content:   "Error cloning repository",
+								Color:     "danger",
+								Timestamp: time.Now(),
 							},
 							{
-								Content: err.Error(),
-								Color:   "danger",
+								Content:   err.Error(),
+								Color:     "danger",
+								Timestamp: time.Now(),
 							},
 						},
 					},
@@ -218,12 +225,14 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 						Title: "Git",
 						Lines: []models.Line{
 							{
-								Content: "Error cloning repository",
-								Color:   "danger",
+								Content:   "Error cloning repository",
+								Color:     "danger",
+								Timestamp: time.Now(),
 							},
 							{
-								Content: err.Error(),
-								Color:   "danger",
+								Content:   err.Error(),
+								Color:     "danger",
+								Timestamp: time.Now(),
 							},
 						},
 					},
@@ -249,8 +258,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				Title: "Git",
 				Lines: []models.Line{
 					{
-						Content: "Repository cloned successfully",
-						Color:   "success",
+						Content:   "Repository cloned successfully",
+						Color:     "success",
+						Timestamp: time.Now(),
 					},
 				},
 			},
@@ -279,7 +289,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Git",
 		Type:    "action",
-		Version: "1.0.3",
+		Version: "1.1.0",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Git",
@@ -296,7 +306,6 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Required:    true,
 					Description: "URL of the repository to clone",
 					Category:    "Repository",
-					Options:     nil,
 				},
 				{
 					Key:         "remote_name",
@@ -306,7 +315,6 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Required:    true,
 					Description: "Name of the remote to clone",
 					Category:    "Repository",
-					Options:     nil,
 				},
 				{
 					Key:         "branch",
@@ -316,7 +324,6 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Required:    true,
 					Description: "Branch to clone",
 					Category:    "Repository",
-					Options:     nil,
 				},
 				{
 					Key:         "directory",
@@ -326,7 +333,6 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Required:    true,
 					Description: "Path to clone the repository to. The path prefix is the workspace directory: " + request.Workspace,
 					Category:    "Repository",
-					Options:     nil,
 				},
 				{
 					Key:         "username",
@@ -336,7 +342,6 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Required:    false,
 					Description: "Username for authentication",
 					Category:    "Authentication",
-					Options:     nil,
 				},
 				{
 					Key:         "password",
@@ -346,7 +351,6 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Required:    false,
 					Description: "Password for authentication",
 					Category:    "Authentication",
-					Options:     nil,
 				},
 				{
 					Key:         "token",
@@ -356,7 +360,6 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Required:    false,
 					Description: "Token for authentication. If provided, username and password will be ignored",
 					Category:    "Authentication",
-					Options:     nil,
 				},
 				{
 					Key:         "private_key",
@@ -366,7 +369,6 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Required:    false,
 					Description: "Private key for authentication",
 					Category:    "Authentication",
-					Options:     nil,
 				},
 				{
 					Key:         "private_key_passphrase",
@@ -376,7 +378,6 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Required:    false,
 					Description: "Passphrase for the private key",
 					Category:    "Authentication",
-					Options:     nil,
 				},
 			},
 		},
