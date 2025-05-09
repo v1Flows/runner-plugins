@@ -29,7 +29,8 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				Title: "Actions Checks",
 				Lines: []models.Line{
 					{
-						Content: "Checking for actions in flow",
+						Content:   "Checking for actions in flow",
+						Timestamp: time.Now(),
 					},
 				},
 			},
@@ -60,8 +61,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 						Title: "Actions Checks",
 						Lines: []models.Line{
 							{
-								Content: "Flow has no Actions defined. Cancel execution",
-								Color:   "danger",
+								Content:   "Flow has no Actions defined. Cancel execution",
+								Color:     "danger",
+								Timestamp: time.Now(),
 							},
 						},
 					},
@@ -90,8 +92,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 						Title: "Actions Checks",
 						Lines: []models.Line{
 							{
-								Content: "Found " + strconv.Itoa(count) + " actions in flow",
-								Color:   "success",
+								Content:   "Found " + strconv.Itoa(count) + " actions in flow",
+								Color:     "success",
+								Timestamp: time.Now(),
 							},
 						},
 					},
@@ -116,15 +119,18 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					Title: "Actions Checks",
 					Lines: []models.Line{
 						{
-							Content: "Flow has no Actions defined",
-							Color:   "danger",
+							Content:   "Flow has no Actions defined",
+							Color:     "danger",
+							Timestamp: time.Now(),
 						},
 						{
-							Content: "Please add actions to the flow",
+							Content:   "Please add actions to the flow",
+							Timestamp: time.Now(),
 						},
 						{
-							Content: "Cancel execution",
-							Color:   "danger",
+							Content:   "Cancel execution",
+							Color:     "danger",
+							Timestamp: time.Now(),
 						},
 					},
 				},
@@ -158,14 +164,14 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Actions Check",
 		Type:    "action",
-		Version: "1.2.5",
+		Version: "1.3.0",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Actions Check",
 			Description: "Check for actions in flow",
 			Plugin:      "actions_check",
-			Icon:        "solar:bolt-linear",
-			Category:    "Flow",
+			Icon:        "hugeicons:blockchain-06",
+			Category:    "Utility",
 			Params:      nil,
 		},
 		Endpoint: models.Endpoint{},

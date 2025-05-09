@@ -48,23 +48,29 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				Title: "Log",
 				Lines: []models.Line{
 					{
-						Content: "Log Action started",
+						Content:   "Log Action started",
+						Timestamp: time.Now(),
 					},
 					{
-						Content: "Execution ID: " + request.Execution.ID.String(),
+						Content:   "Execution ID: " + request.Execution.ID.String(),
+						Timestamp: time.Now(),
 					},
 					{
-						Content: "Step ID: " + request.Step.ID.String(),
+						Content:   "Step ID: " + request.Step.ID.String(),
+						Timestamp: time.Now(),
 					},
 					{
-						Content: "Additional Message",
+						Content:   "Additional Message",
+						Timestamp: time.Now(),
 					},
 					{
-						Content: additionalMessage,
+						Content:   additionalMessage,
+						Timestamp: time.Now(),
 					},
 					{
-						Content: "Log Action finished",
-						Color:   "success",
+						Content:   "Log Action finished",
+						Color:     "success",
+						Timestamp: time.Now(),
 					},
 				},
 			},
@@ -94,7 +100,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Log",
 		Type:    "action",
-		Version: "1.2.6",
+		Version: "1.3.0",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Log Message",

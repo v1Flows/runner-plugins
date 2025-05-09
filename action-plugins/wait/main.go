@@ -37,7 +37,8 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				Title: "Wait",
 				Lines: []models.Line{
 					{
-						Content: `Waiting for ` + strconv.Itoa(waitTime) + ` seconds`,
+						Content:   `Waiting for ` + strconv.Itoa(waitTime) + ` seconds`,
+						Timestamp: time.Now(),
 					},
 				},
 			},
@@ -64,12 +65,14 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				Title: "Wait",
 				Lines: []models.Line{
 					{
-						Content: "Wait finished",
-						Color:   "success",
+						Content:   "Wait finished",
+						Color:     "success",
+						Timestamp: time.Now(),
 					},
 					{
-						Content: "Continuing to next step",
-						Color:   "success",
+						Content:   "Continuing to next step",
+						Color:     "success",
+						Timestamp: time.Now(),
 					},
 				},
 			},
@@ -98,13 +101,13 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Wait",
 		Type:    "action",
-		Version: "1.2.4",
+		Version: "1.3.0",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Wait",
 			Description: "Waits for a specified amount of time",
 			Plugin:      "wait",
-			Icon:        "solar:clock-circle-broken",
+			Icon:        "hugeicons:pause",
 			Category:    "Utility",
 			Params: []models.Params{
 				{
@@ -113,7 +116,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "10",
 					Required:    true,
 					Description: "The time to wait in seconds",
-					Options:     nil,
+					Category:    "General",
 				},
 			},
 		},

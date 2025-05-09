@@ -55,10 +55,12 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				Title: "Step Analysis",
 				Lines: []models.Line{
 					{
-						Content: "Starting step analysis",
+						Content:   "Starting step analysis",
+						Timestamp: time.Now(),
 					},
 					{
-						Content: "Requesting all steps for the current execution",
+						Content:   "Requesting all steps for the current execution",
+						Timestamp: time.Now(),
 					},
 				},
 			},
@@ -87,10 +89,12 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				Title: "Step Analysis",
 				Lines: []models.Line{
 					{
-						Content: "Received " + strconv.Itoa(len(steps)) + " total steps for further analysis",
+						Content:   "Received " + strconv.Itoa(len(steps)) + " total steps for further analysis",
+						Timestamp: time.Now(),
 					},
 					{
-						Content: "Filtering steps based on the provided action ID: " + actionID,
+						Content:   "Filtering steps based on the provided action ID: " + actionID,
+						Timestamp: time.Now(),
 					},
 				},
 			},
@@ -119,8 +123,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					Title: "Step Analysis",
 					Lines: []models.Line{
 						{
-							Content: "Step not found",
-							Color:   "danger",
+							Content:   "Step not found",
+							Color:     "danger",
+							Timestamp: time.Now(),
 						},
 					},
 				},
@@ -153,8 +158,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				Title: "Step Analysis",
 				Lines: []models.Line{
 					{
-						Content: "Step found: " + stepName,
-						Color:   "success",
+						Content:   "Step found: " + stepName,
+						Color:     "success",
+						Timestamp: time.Now(),
 					},
 				},
 			},
@@ -175,8 +181,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					Title: "Step Analysis",
 					Lines: []models.Line{
 						{
-							Content: "Step is in pending state. Please select an step that has finished",
-							Color:   "danger",
+							Content:   "Step is in pending state. Please select an step that has finished",
+							Color:     "danger",
+							Timestamp: time.Now(),
 						},
 					},
 				},
@@ -204,13 +211,16 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					Title: "Step Analysis",
 					Lines: []models.Line{
 						{
-							Content: "Checking the step messages based on the provided string and condition",
+							Content:   "Checking the step messages based on the provided string and condition",
+							Timestamp: time.Now(),
 						},
 						{
-							Content: "Line content: " + lineContent,
+							Content:   "Line content: " + lineContent,
+							Timestamp: time.Now(),
 						},
 						{
-							Content: "Condition: " + condition,
+							Content:   "Condition: " + condition,
+							Timestamp: time.Now(),
 						},
 					},
 				},
@@ -243,11 +253,13 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 							Title: "Step Analysis",
 							Lines: []models.Line{
 								{
-									Content: "Line in step message found",
-									Color:   "success",
+									Content:   "Line in step message found",
+									Color:     "success",
+									Timestamp: time.Now(),
 								},
 								{
-									Content: "Matched line content: " + discoveredLineContent,
+									Content:   "Matched line content: " + discoveredLineContent,
+									Timestamp: time.Now(),
 								},
 							},
 						},
@@ -272,8 +284,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 							Title: "Step Analysis",
 							Lines: []models.Line{
 								{
-									Content: "Line not found in step messages",
-									Color:   "danger",
+									Content:   "Line not found in step messages",
+									Color:     "danger",
+									Timestamp: time.Now(),
 								},
 							},
 						},
@@ -314,8 +327,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 							Title: "Step Analysis",
 							Lines: []models.Line{
 								{
-									Content: "Did not find the line in step messages",
-									Color:   "success",
+									Content:   "Did not find the line in step messages",
+									Color:     "success",
+									Timestamp: time.Now(),
 								},
 							},
 						},
@@ -340,11 +354,13 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 							Title: "Step Analysis",
 							Lines: []models.Line{
 								{
-									Content: "Line was found in step messages",
-									Color:   "danger",
+									Content:   "Line was found in step messages",
+									Color:     "danger",
+									Timestamp: time.Now(),
 								},
 								{
-									Content: "Matched line content: " + discoveredLineContent,
+									Content:   "Matched line content: " + discoveredLineContent,
+									Timestamp: time.Now(),
 								},
 							},
 						},
@@ -373,11 +389,13 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 									Title: "Step Analysis",
 									Lines: []models.Line{
 										{
-											Content: "Lines in step message contains the string",
-											Color:   "success",
+											Content:   "Lines in step message contains the string",
+											Color:     "success",
+											Timestamp: time.Now(),
 										},
 										{
-											Content: "Matched line content: " + line.Content,
+											Content:   "Matched line content: " + line.Content,
+											Timestamp: time.Now(),
 										},
 									},
 								},
@@ -405,8 +423,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 						Title: "Step Analysis",
 						Lines: []models.Line{
 							{
-								Content: "Lines in step message does not contain the string",
-								Color:   "danger",
+								Content:   "Lines in step message does not contain the string",
+								Color:     "danger",
+								Timestamp: time.Now(),
 							},
 						},
 					},
@@ -446,8 +465,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 							Title: "Step Analysis",
 							Lines: []models.Line{
 								{
-									Content: "Lines in step message does not contain the string",
-									Color:   "success",
+									Content:   "Lines in step message does not contain the string",
+									Color:     "success",
+									Timestamp: time.Now(),
 								},
 							},
 						},
@@ -472,11 +492,13 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 							Title: "Step Analysis",
 							Lines: []models.Line{
 								{
-									Content: "Lines in step message contains the string",
-									Color:   "danger",
+									Content:   "Lines in step message contains the string",
+									Color:     "danger",
+									Timestamp: time.Now(),
 								},
 								{
-									Content: "Matched line content: " + discoveredLineContent,
+									Content:   "Matched line content: " + discoveredLineContent,
+									Timestamp: time.Now(),
 								},
 							},
 						},
@@ -503,10 +525,12 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					Title: "Step Analysis",
 					Lines: []models.Line{
 						{
-							Content: "Checking the step messages based on the provided regex pattern",
+							Content:   "Checking the step messages based on the provided regex pattern",
+							Timestamp: time.Now(),
 						},
 						{
-							Content: "Regex Pattern: " + regexPattern,
+							Content:   "Regex Pattern: " + regexPattern,
+							Timestamp: time.Now(),
 						},
 					},
 				},
@@ -541,11 +565,13 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 						Title: "Step Analysis",
 						Lines: []models.Line{
 							{
-								Content: "Regex pattern matched in step messages",
-								Color:   "success",
+								Content:   "Regex pattern matched in step messages",
+								Color:     "success",
+								Timestamp: time.Now(),
 							},
 							{
-								Content: "Matched line content: " + discoveredLineContent,
+								Content:   "Matched line content: " + discoveredLineContent,
+								Timestamp: time.Now(),
 							},
 						},
 					},
@@ -570,8 +596,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 						Title: "Step Analysis",
 						Lines: []models.Line{
 							{
-								Content: "Regex pattern did not match in step messages",
-								Color:   "danger",
+								Content:   "Regex pattern did not match in step messages",
+								Color:     "danger",
+								Timestamp: time.Now(),
 							},
 						},
 					},
@@ -606,7 +633,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Step Analysis",
 		Type:    "action",
-		Version: "1.0.1",
+		Version: "1.1.0",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Step Analysis",
