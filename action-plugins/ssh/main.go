@@ -272,6 +272,7 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					},
 				},
 			},
+			Status: "running",
 		}, request.Platform)
 		if err != nil {
 			return plugins.Response{
@@ -420,7 +421,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "SSH",
 		Type:    "action",
-		Version: "1.3.0",
+		Version: "1.3.1",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "SSH",
