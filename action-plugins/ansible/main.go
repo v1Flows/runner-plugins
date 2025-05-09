@@ -67,8 +67,9 @@ func handleOutput(output string, color string, request plugins.ExecuteTaskReques
 				Title: "Ansible Playbook",
 				Lines: []models.Line{
 					{
-						Content: output,
-						Color:   color,
+						Content:   output,
+						Color:     color,
+						Timestamp: time.Now(),
 					},
 				},
 			},
@@ -152,13 +153,16 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				Title: "Ansible Playbook",
 				Lines: []models.Line{
 					{
-						Content: "Starting Ansible Playbook",
+						Content:   "Starting Ansible Playbook",
+						Timestamp: time.Now(),
 					},
 					{
-						Content: "Playbook: " + play,
+						Content:   "Playbook: " + play,
+						Timestamp: time.Now(),
 					},
 					{
-						Content: "Inventory: " + inventory,
+						Content:   "Inventory: " + inventory,
+						Timestamp: time.Now(),
 					},
 				},
 			},
@@ -181,12 +185,14 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					Title: "Ansible Playbook",
 					Lines: []models.Line{
 						{
-							Content: "Playbook file does not exist",
-							Color:   "danger",
+							Content:   "Playbook file does not exist",
+							Color:     "danger",
+							Timestamp: time.Now(),
 						},
 						{
-							Content: err.Error(),
-							Color:   "danger",
+							Content:   err.Error(),
+							Color:     "danger",
+							Timestamp: time.Now(),
 						},
 					},
 				},
@@ -215,12 +221,14 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 						Title: "Ansible Playbook",
 						Lines: []models.Line{
 							{
-								Content: "Inventory file does not exist",
-								Color:   "danger",
+								Content:   "Inventory file does not exist",
+								Color:     "danger",
+								Timestamp: time.Now(),
 							},
 							{
-								Content: err.Error(),
-								Color:   "danger",
+								Content:   err.Error(),
+								Color:     "danger",
+								Timestamp: time.Now(),
 							},
 						},
 					},
@@ -288,12 +296,14 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 							Title: "Ansible Playbook",
 							Lines: []models.Line{
 								{
-									Content: "Ansible Playbook failed",
-									Color:   "danger",
+									Content:   "Ansible Playbook failed",
+									Color:     "danger",
+									Timestamp: time.Now(),
 								},
 								{
-									Content: err.Error(),
-									Color:   "danger",
+									Content:   err.Error(),
+									Color:     "danger",
+									Timestamp: time.Now(),
 								},
 							},
 						},
@@ -323,12 +333,14 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					Title: "Ansible Playbook",
 					Lines: []models.Line{
 						{
-							Content: "Ansible Playbook failed",
-							Color:   "danger",
+							Content:   "Ansible Playbook failed",
+							Color:     "danger",
+							Timestamp: time.Now(),
 						},
 						{
-							Content: err.Error(),
-							Color:   "danger",
+							Content:   err.Error(),
+							Color:     "danger",
+							Timestamp: time.Now(),
 						},
 					},
 				},
@@ -355,8 +367,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				Title: "Ansible Playbook",
 				Lines: []models.Line{
 					{
-						Content: "Ansible Playbook executed successfully",
-						Color:   "success",
+						Content:   "Ansible Playbook executed successfully",
+						Color:     "success",
+						Timestamp: time.Now(),
 					},
 				},
 			},
@@ -385,7 +398,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Ansible",
 		Type:    "action",
-		Version: "1.0.3",
+		Version: "1.1.0",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Ansible",
@@ -402,7 +415,6 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "",
 					Required:    true,
 					Description: "Path to the playbook file. The path prefix is the workspace directory: " + request.Workspace,
-					Options:     nil,
 				},
 				{
 					Key:         "inventory",
@@ -412,7 +424,6 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "",
 					Required:    true,
 					Description: "Path to the inventory file or comma separated host list. The path prefix is the workspace directory: " + request.Workspace,
-					Options:     nil,
 				},
 				{
 					Key:         "user",
@@ -422,7 +433,6 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "",
 					Required:    false,
 					Description: "Connect as this user",
-					Options:     nil,
 				},
 				{
 					Key:         "password",
@@ -432,7 +442,6 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "",
 					Required:    false,
 					Description: "Connection user password",
-					Options:     nil,
 				},
 				{
 					Key:         "private_key",
@@ -442,7 +451,6 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "",
 					Required:    false,
 					Description: "Path to the private key file",
-					Options:     nil,
 				},
 				{
 					Key:         "limit",
@@ -452,7 +460,6 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "",
 					Required:    false,
 					Description: "Further limit selected hosts to an additional pattern",
-					Options:     nil,
 				},
 				{
 					Key:         "become",
@@ -462,7 +469,6 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "false",
 					Required:    false,
 					Description: "Run playbook with become",
-					Options:     nil,
 				},
 				{
 					Key:         "become_user",
@@ -472,7 +478,6 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "root",
 					Required:    false,
 					Description: "User to run become tasks with",
-					Options:     nil,
 				},
 				{
 					Key:         "become_pass",
@@ -482,7 +487,6 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "",
 					Required:    false,
 					Description: "Become user password",
-					Options:     nil,
 				},
 				{
 					Key:         "check",
@@ -492,7 +496,6 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "false",
 					Required:    false,
 					Description: "Don't make any changes; instead, try to predict some of the changes that may occur",
-					Options:     nil,
 				},
 				{
 					Key:         "diff",
@@ -502,7 +505,6 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "false",
 					Required:    false,
 					Description: "When changing (small) files and templates, show the differences in those files",
-					Options:     nil,
 				},
 				{
 					Key:         "verbose",
@@ -512,7 +514,6 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "0",
 					Required:    false,
 					Description: "Set the verbosity level. Default is 0",
-					Options:     nil,
 				},
 			},
 		},

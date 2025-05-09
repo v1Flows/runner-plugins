@@ -36,8 +36,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				Title: "SSH",
 				Lines: []models.Line{
 					{
-						Content: "Starting ssh action",
-						Color:   "primary",
+						Content:   "Starting ssh action",
+						Color:     "primary",
+						Timestamp: time.Now(),
 					},
 				},
 			},
@@ -115,7 +116,8 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					Title: "SSH",
 					Lines: []models.Line{
 						{
-							Content: "Use private key file to authenticate",
+							Content:   "Use private key file to authenticate",
+							Timestamp: time.Now(),
 						},
 					},
 				},
@@ -143,7 +145,8 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					Title: "SSH",
 					Lines: []models.Line{
 						{
-							Content: "Use SSH agent to authenticate",
+							Content:   "Use SSH agent to authenticate",
+							Timestamp: time.Now(),
 						},
 					},
 				},
@@ -167,7 +170,8 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					Title: "SSH",
 					Lines: []models.Line{
 						{
-							Content: "Use password to authenticate",
+							Content:   "Use password to authenticate",
+							Timestamp: time.Now(),
 						},
 					},
 				},
@@ -187,7 +191,8 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				Title: "SSH",
 				Lines: []models.Line{
 					{
-						Content: "Connecting to remote server " + target + " as " + username,
+						Content:   "Connecting to remote server " + target + " as " + username,
+						Timestamp: time.Now(),
 					},
 				},
 			},
@@ -215,12 +220,14 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					Title: "SSH",
 					Lines: []models.Line{
 						{
-							Content: "Failed to connect to remote server",
-							Color:   "danger",
+							Content:   "Failed to connect to remote server",
+							Color:     "danger",
+							Timestamp: time.Now(),
 						},
 						{
-							Content: err.Error(),
-							Color:   "danger",
+							Content:   err.Error(),
+							Color:     "danger",
+							Timestamp: time.Now(),
 						},
 					},
 				},
@@ -250,14 +257,17 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					Title: "SSH",
 					Lines: []models.Line{
 						{
-							Content: "-------------------------",
+							Content:   "-------------------------",
+							Timestamp: time.Now(),
 						},
 						{
-							Content: "Executing command: " + command,
-							Color:   "primary",
+							Content:   "Executing command: " + command,
+							Color:     "primary",
+							Timestamp: time.Now(),
 						},
 						{
-							Content: "-------------------------",
+							Content:   "-------------------------",
+							Timestamp: time.Now(),
 						},
 					},
 				},
@@ -284,12 +294,18 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 						Title: "SSH",
 						Lines: []models.Line{
 							{
-								Content: "Failed to execute command",
-								Color:   "danger",
+								Content:   "Failed to execute command",
+								Color:     "danger",
+								Timestamp: time.Now(),
 							},
 							{
-								Content: err.Error(),
-								Color:   "danger",
+								Content:   err.Error(),
+								Color:     "danger",
+								Timestamp: time.Now(),
+							},
+							{
+								Content:   "-------------------------",
+								Timestamp: time.Now(),
 							},
 							{
 								Content: "-------------------------",
@@ -315,8 +331,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 							Title: "SSH",
 							Lines: []models.Line{
 								{
-									Content: line,
-									Color:   "danger",
+									Content:   line,
+									Color:     "danger",
+									Timestamp: time.Now(),
 								},
 							},
 						},
@@ -344,7 +361,8 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 						Title: "SSH",
 						Lines: []models.Line{
 							{
-								Content: line,
+								Content:   line,
+								Timestamp: time.Now(),
 							},
 						},
 					},
@@ -371,8 +389,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				Title: "SSH",
 				Lines: []models.Line{
 					{
-						Content: "SSH action completed",
-						Color:   "success",
+						Content:   "SSH action completed",
+						Color:     "success",
+						Timestamp: time.Now(),
 					},
 				},
 			},
@@ -401,7 +420,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "SSH",
 		Type:    "action",
-		Version: "1.2.0",
+		Version: "1.3.0",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "SSH",

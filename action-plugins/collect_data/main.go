@@ -69,8 +69,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					Title: "Collecting Data",
 					Lines: []models.Line{
 						{
-							Content: "FlowID and AlertID are required",
-							Color:   "danger",
+							Content:   "FlowID and AlertID are required",
+							Color:     "danger",
+							Timestamp: time.Now(),
 						},
 					},
 				},
@@ -91,7 +92,8 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				Title: "Collecting Data",
 				Lines: []models.Line{
 					{
-						Content: "Collecting data from " + request.Platform,
+						Content:   "Collecting data from " + request.Platform,
+						Timestamp: time.Now(),
 					},
 				},
 			},
@@ -115,12 +117,14 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					Title: "Collecting Data",
 					Lines: []models.Line{
 						{
-							Content: "Failed to get Flow Data",
-							Color:   "danger",
+							Content:   "Failed to get Flow Data",
+							Color:     "danger",
+							Timestamp: time.Now(),
 						},
 						{
-							Content: err.Error(),
-							Color:   "danger",
+							Content:   err.Error(),
+							Color:     "danger",
+							Timestamp: time.Now(),
 						},
 					},
 				},
@@ -149,12 +153,14 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					Title: "Collecting Data",
 					Lines: []models.Line{
 						{
-							Content: "Failed to unmarshal Flow Data",
-							Color:   "danger",
+							Content:   "Failed to unmarshal Flow Data",
+							Color:     "danger",
+							Timestamp: time.Now(),
 						},
 						{
-							Content: err.Error(),
-							Color:   "danger",
+							Content:   err.Error(),
+							Color:     "danger",
+							Timestamp: time.Now(),
 						},
 					},
 				},
@@ -176,7 +182,8 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				Title: "Collecting Data",
 				Lines: []models.Line{
 					{
-						Content: "Flow Data collected",
+						Content:   "Flow Data collected",
+						Timestamp: time.Now(),
 					},
 				},
 			},
@@ -200,12 +207,14 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 						Title: "Collecting Data",
 						Lines: []models.Line{
 							{
-								Content: "Failed to get Alert Data",
-								Color:   "danger",
+								Content:   "Failed to get Alert Data",
+								Color:     "danger",
+								Timestamp: time.Now(),
 							},
 							{
-								Content: err.Error(),
-								Color:   "danger",
+								Content:   err.Error(),
+								Color:     "danger",
+								Timestamp: time.Now(),
 							},
 						},
 					},
@@ -231,8 +240,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					Title: "Collecting Data",
 					Lines: []models.Line{
 						{
-							Content: "Alert Data collected",
-							Color:   "success",
+							Content:   "Alert Data collected",
+							Color:     "success",
+							Timestamp: time.Now(),
 						},
 					},
 				},
@@ -249,27 +259,33 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 
 	if logData {
 		finalMessages = append(finalMessages, models.Line{
-			Content: "Data collection completed",
-			Color:   "success",
+			Content:   "Data collection completed",
+			Color:     "success",
+			Timestamp: time.Now(),
 		})
 		finalMessages = append(finalMessages, models.Line{
-			Content: "Flow Data:",
+			Content:   "Flow Data:",
+			Timestamp: time.Now(),
 		})
 		finalMessages = append(finalMessages, models.Line{
-			Content: fmt.Sprintf("%v", flow.Flow),
+			Content:   fmt.Sprintf("%v", flow.Flow),
+			Timestamp: time.Now(),
 		})
 		if request.Platform == "alertflow" && alertID != "" {
 			finalMessages = append(finalMessages, models.Line{
-				Content: "Alert Data:",
+				Content:   "Alert Data:",
+				Timestamp: time.Now(),
 			})
 			finalMessages = append(finalMessages, models.Line{
-				Content: fmt.Sprintf("%v", alert),
+				Content:   fmt.Sprintf("%v", alert),
+				Timestamp: time.Now(),
 			})
 		}
 	} else {
 		finalMessages = append(finalMessages, models.Line{
-			Content: "Data collection completed",
-			Color:   "success",
+			Content:   "Data collection completed",
+			Color:     "success",
+			Timestamp: time.Now(),
 		})
 	}
 
@@ -308,7 +324,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Collect Data",
 		Type:    "action",
-		Version: "1.2.7",
+		Version: "1.3.0",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Collect Data",
@@ -324,7 +340,6 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Required:    false,
 					Description: "Show collected data in the output messages",
 					Category:    "General",
-					Options:     nil,
 				},
 				{
 					Key:         "FlowID",
@@ -333,7 +348,6 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Required:    true,
 					Description: "The Flow ID to collect data from",
 					Category:    "General",
-					Options:     nil,
 				},
 				{
 					Key:         "AlertID",
@@ -342,7 +356,6 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Required:    false,
 					Description: "The Alert ID to collect data from. Required for AlertFlow platform",
 					Category:    "General",
-					Options:     nil,
 				},
 			},
 		},

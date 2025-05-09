@@ -43,7 +43,8 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				Title: "Ping",
 				Lines: []models.Line{
 					{
-						Content: "Start Ping on target: " + target,
+						Content:   "Start Ping on target: " + target,
+						Timestamp: time.Now(),
 					},
 				},
 			},
@@ -66,12 +67,14 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					Title: "Ping",
 					Lines: []models.Line{
 						{
-							Content: "Error creating pinger",
-							Color:   "danger",
+							Content:   "Error creating pinger",
+							Color:     "danger",
+							Timestamp: time.Now(),
 						},
 						{
-							Content: err.Error(),
-							Color:   "danger",
+							Content:   err.Error(),
+							Color:     "danger",
+							Timestamp: time.Now(),
 						},
 					},
 				},
@@ -106,12 +109,14 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					Title: "Ping",
 					Lines: []models.Line{
 						{
-							Content: msg,
-							Color:   "danger",
+							Content:   msg,
+							Color:     "danger",
+							Timestamp: time.Now(),
 						},
 						{
-							Content: err.Error(),
-							Color:   "danger",
+							Content:   err.Error(),
+							Color:     "danger",
+							Timestamp: time.Now(),
 						},
 					},
 				},
@@ -137,25 +142,32 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				Title: "Ping",
 				Lines: []models.Line{
 					{
-						Content: "Ping results",
+						Content:   "Ping results",
+						Timestamp: time.Now(),
 					},
 					{
-						Content: "Sent: " + strconv.Itoa(stats.PacketsSent),
+						Content:   "Sent: " + strconv.Itoa(stats.PacketsSent),
+						Timestamp: time.Now(),
 					},
 					{
-						Content: "Received: " + strconv.Itoa(stats.PacketsRecv),
+						Content:   "Received: " + strconv.Itoa(stats.PacketsRecv),
+						Timestamp: time.Now(),
 					},
 					{
-						Content: "Lost: " + strconv.Itoa(int(stats.PacketLoss)) + "%",
+						Content:   "Lost: " + strconv.Itoa(int(stats.PacketLoss)) + "%",
+						Timestamp: time.Now(),
 					},
 					{
-						Content: "RTT min: " + stats.MinRtt.String(),
+						Content:   "RTT min: " + stats.MinRtt.String(),
+						Timestamp: time.Now(),
 					},
 					{
-						Content: "RTT max: " + stats.MaxRtt.String(),
+						Content:   "RTT max: " + stats.MaxRtt.String(),
+						Timestamp: time.Now(),
 					},
 					{
-						Content: "RTT avg: " + stats.AvgRtt.String(),
+						Content:   "RTT avg: " + stats.AvgRtt.String(),
+						Timestamp: time.Now(),
 					},
 				},
 			},
@@ -175,8 +187,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					Title: "Ping",
 					Lines: []models.Line{
 						{
-							Content: "Number of lost packages is greater than the maximum allowed",
-							Color:   "danger",
+							Content:   "Number of lost packages is greater than the maximum allowed",
+							Color:     "danger",
+							Timestamp: time.Now(),
 						},
 					},
 				},
@@ -202,8 +215,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				Title: "Ping",
 				Lines: []models.Line{
 					{
-						Content: "Ping completed successfully",
-						Color:   "success",
+						Content:   "Ping completed successfully",
+						Color:     "success",
+						Timestamp: time.Now(),
 					},
 				},
 			},
@@ -232,7 +246,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Ping",
 		Type:    "action",
-		Version: "1.3.0",
+		Version: "1.4.0",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Ping",
