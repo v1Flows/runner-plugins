@@ -6,7 +6,7 @@ require (
 	github.com/hashicorp/go-plugin v1.6.3
 	github.com/tidwall/gjson v1.18.0
 	github.com/v1Flows/alertFlow/services/backend v0.0.0-20250317112742-7a11f04dd445
-	github.com/v1Flows/runner v1.0.3
+	github.com/v1Flows/runner v1.0.6
 	github.com/v1Flows/shared-library v1.0.19
 )
 
@@ -32,7 +32,7 @@ require (
 	github.com/spf13/afero v1.12.0 // indirect
 	github.com/spf13/cast v1.7.1 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
-	github.com/spf13/viper v1.20.0 // indirect
+	github.com/spf13/viper v1.20.1 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
@@ -44,7 +44,7 @@ require (
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
 	golang.org/x/crypto v0.36.0 // indirect
-	golang.org/x/net v0.36.0 // indirect
+	golang.org/x/net v0.38.0 // indirect
 	golang.org/x/sys v0.31.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250212204824-5a70512c5d8b // indirect
