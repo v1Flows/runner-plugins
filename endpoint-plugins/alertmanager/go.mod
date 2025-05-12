@@ -7,8 +7,8 @@ require (
 	github.com/hashicorp/go-plugin v1.6.3
 	github.com/tidwall/gjson v1.18.0
 	github.com/v1Flows/alertFlow/services/backend v0.0.0-20250317112742-7a11f04dd445
-	github.com/v1Flows/runner v1.0.5
-	github.com/v1Flows/shared-library v1.0.17
+	github.com/v1Flows/runner v1.1.0
+	github.com/v1Flows/shared-library v1.0.21
 )
 
 require (
@@ -48,6 +48,6 @@ require (
 	golang.org/x/text v0.23.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250212204824-5a70512c5d8b // indirect
 	google.golang.org/grpc v1.70.0 // indirect
-	google.golang.org/protobuf v1.36.5 // indirect
+	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
