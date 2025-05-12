@@ -6,7 +6,7 @@ require (
 	github.com/hashicorp/go-plugin v1.6.3
 	github.com/melbahja/goph v1.4.0
 	github.com/v1Flows/runner v1.0.5
-	github.com/v1Flows/shared-library v1.0.19
+	github.com/v1Flows/shared-library v1.0.21
 	golang.org/x/crypto v0.38.0
 )
 
