@@ -8,7 +8,7 @@ require (
 	github.com/tidwall/gjson v1.18.0
 	github.com/v1Flows/alertFlow/services/backend v0.0.0-20250317112742-7a11f04dd445
 	github.com/v1Flows/runner v1.0.5
-	github.com/v1Flows/shared-library v1.0.17
+	github.com/v1Flows/shared-library v1.0.21
 )
 
 require (
