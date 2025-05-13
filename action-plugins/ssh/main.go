@@ -411,6 +411,12 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 	}, nil
 }
 
+func (p *Plugin) CancelTask(request plugins.CancelTaskRequest) (plugins.Response, error) {
+	return plugins.Response{
+		Success: false,
+	}, nil
+}
+
 func (p *Plugin) EndpointRequest(request plugins.EndpointRequest) (plugins.Response, error) {
 	return plugins.Response{
 		Success: false,
@@ -421,7 +427,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "SSH",
 		Type:    "action",
-		Version: "1.3.1",
+		Version: "1.3.2",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "SSH",
@@ -525,6 +531,12 @@ type PluginRPCServer struct {
 
 func (s *PluginRPCServer) ExecuteTask(request plugins.ExecuteTaskRequest, resp *plugins.Response) error {
 	result, err := s.Impl.ExecuteTask(request)
+	*resp = result
+	return err
+}
+
+func (s *PluginRPCServer) CancelTask(request plugins.CancelTaskRequest, resp *plugins.Response) error {
+	result, err := s.Impl.CancelTask(request)
 	*resp = result
 	return err
 }
