@@ -1,11 +1,13 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net/rpc"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/v1Flows/runner/pkg/alerts"
@@ -27,10 +29,28 @@ type IncomingFlow struct {
 	Flow models.Flows `json:"flow"`
 }
 
+var (
+	taskCancels   = make(map[string]context.CancelFunc)
+	taskCancelsMu sync.Mutex
+)
+
 // Plugin is an implementation of the Plugin interface
 type Plugin struct{}
 
 func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Response, error) {
+	ctx, cancel := context.WithCancel(context.Background())
+	stepID := request.Step.ID.String()
+
+	// Store cancel func
+	taskCancelsMu.Lock()
+	taskCancels[stepID] = cancel
+	taskCancelsMu.Unlock()
+	defer func() {
+		taskCancelsMu.Lock()
+		delete(taskCancels, stepID)
+		taskCancelsMu.Unlock()
+	}()
+
 	flowID := ""
 	alertID := ""
 	logData := false
@@ -105,6 +125,34 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 		return plugins.Response{
 			Success: false,
 		}, err
+	}
+
+	// Check for cancellation before each major step
+	if ctx.Err() != nil {
+		err := executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
+			ID: request.Step.ID,
+			Messages: []models.Message{
+				{
+					Title: "Collecting Data",
+					Lines: []models.Line{
+						{
+							Content:   "Task canceled",
+							Color:     "danger",
+							Timestamp: time.Now(),
+						},
+					},
+				},
+			},
+			Status:     "canceled",
+			FinishedAt: time.Now(),
+		}, request.Platform)
+		if err != nil {
+			return plugins.Response{
+				Success: false,
+			}, err
+		}
+
+		return plugins.Response{Success: false, Canceled: true}, nil
 	}
 
 	// Get Flow Data
@@ -197,6 +245,34 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 
 	var alert af_models.Alerts
 	if request.Platform == "alertflow" && alertID != "" {
+		// Check for cancellation before each major step
+		if ctx.Err() != nil {
+			err := executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
+				ID: request.Step.ID,
+				Messages: []models.Message{
+					{
+						Title: "Collecting Data",
+						Lines: []models.Line{
+							{
+								Content:   "Task canceled",
+								Color:     "danger",
+								Timestamp: time.Now(),
+							},
+						},
+					},
+				},
+				Status:     "canceled",
+				FinishedAt: time.Now(),
+			}, request.Platform)
+			if err != nil {
+				return plugins.Response{
+					Success: false,
+				}, err
+			}
+
+			return plugins.Response{Success: false, Canceled: true}, nil
+		}
+
 		// Get Alert Data
 		alert, err = alerts.GetData(request.Config, alertID)
 		if err != nil {
@@ -314,6 +390,22 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 	}, nil
 }
 
+func (p *Plugin) CancelTask(request plugins.CancelTaskRequest) (plugins.Response, error) {
+	stepID := request.Step.ID.String()
+	taskCancelsMu.Lock()
+	cancel, ok := taskCancels[stepID]
+	taskCancelsMu.Unlock()
+
+	if !ok {
+		return plugins.Response{
+			Success: false,
+		}, errors.New("task not found")
+	}
+
+	cancel()
+	return plugins.Response{Success: true}, nil
+}
+
 func (p *Plugin) EndpointRequest(request plugins.EndpointRequest) (plugins.Response, error) {
 	return plugins.Response{
 		Success: false,
@@ -324,7 +416,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Collect Data",
 		Type:    "action",
-		Version: "1.3.0",
+		Version: "1.3.1",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Collect Data",
@@ -372,6 +464,12 @@ type PluginRPCServer struct {
 
 func (s *PluginRPCServer) ExecuteTask(request plugins.ExecuteTaskRequest, resp *plugins.Response) error {
 	result, err := s.Impl.ExecuteTask(request)
+	*resp = result
+	return err
+}
+
+func (s *PluginRPCServer) CancelTask(request plugins.CancelTaskRequest, resp *plugins.Response) error {
+	result, err := s.Impl.CancelTask(request)
 	*resp = result
 	return err
 }

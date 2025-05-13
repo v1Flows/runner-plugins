@@ -97,10 +97,10 @@ github.com/v1Flows/alertFlow/services/backend v0.0.0-20250317112742-7a11f04dd445
 github.com/v1Flows/alertFlow/services/backend v0.0.0-20250317112742-7a11f04dd445/go.mod h1:wN72OUmADQ95eNYyiYM4oa6FOnvoCBRljzsGQGdvaIA=
 github.com/v1Flows/exFlow/services/backend v0.0.0-20250314134041-010ef4dcb540 h1:Fu/mOZKwyRpm8QP5FfgAnDfv1XjgEJAKjHNzTVlIxW0=
 github.com/v1Flows/exFlow/services/backend v0.0.0-20250314134041-010ef4dcb540/go.mod h1:63Ad53i4eEkN3C6QeTsOWvLASjn43+cEwrWAcllX8So=
-github.com/v1Flows/runner v1.0.5 h1:F7vIgqWKq+RKR8gIkV8imPoX6sARrdOV/XXEl9znl2w=
-github.com/v1Flows/runner v1.0.5/go.mod h1:FIDADMiQ9l+XNIXFzM6C751Zu1EVCq1iVGeEms5QIEo=
-github.com/v1Flows/shared-library v1.0.19 h1:9qiWBGaZQ5Vx67E5U7Ww6Q8KWMafxwaIVk7QCMJuy0Q=
-github.com/v1Flows/shared-library v1.0.19/go.mod h1:UVP6m6Nri6JC3L0xS3wkbqGvfQJ5fsYIJx81Gfj1TFw=
+github.com/v1Flows/runner v1.1.0 h1:AczXQnZmNj8GGVb05NEIDwt+8Reie2O/OlHqFWRgj/U=
+github.com/v1Flows/runner v1.1.0/go.mod h1:kWTSUeYYs1Y3hEsUyLITfWP1wQwZr7IjFWMZKqoI0wg=
+github.com/v1Flows/shared-library v1.0.21 h1:G7GFplYrvmTRzJBvzSlqFEli54a+QlhORPdZ4pAC3ps=
+github.com/v1Flows/shared-library v1.0.21/go.mod h1:UVP6m6Nri6JC3L0xS3wkbqGvfQJ5fsYIJx81Gfj1TFw=
 github.com/vmihailenco/msgpack/v5 v5.4.1 h1:cQriyiUvjTwOHg8QZaPihLWeRAAVoCpE00IUPn0Bjt8=
 github.com/vmihailenco/msgpack/v5 v5.4.1/go.mod h1:GaZTsDaehaPpQVyxrf5mtQlH+pc21PIudVV/E3rRQok=
 github.com/vmihailenco/tagparser/v2 v2.0.0 h1:y09buUbR+b5aycVFQs/g70pqKVZNBmxwAhO7/IwNM9g=
@@ -186,8 +186,8 @@ google.golang.org/genproto/googleapis/rpc v0.0.0-20250212204824-5a70512c5d8b h1:
 google.golang.org/genproto/googleapis/rpc v0.0.0-20250212204824-5a70512c5d8b/go.mod h1:8BS3B93F/U1juMFq9+EDk+qOT5CO1R9IzXxG3PTqiRk=
 google.golang.org/grpc v1.70.0 h1:pWFv03aZoHzlRKHWicjsZytKAiYCtNS0dHbXnIdq7jQ=
 google.golang.org/grpc v1.70.0/go.mod h1:ofIJqVKDXx/JiXrwr2IG4/zwdH9txy3IlF40RmcJSQw=
-google.golang.org/protobuf v1.36.5 h1:tPhr+woSbjfYvY6/GPufUoYizxw1cF/yFoxJ2fmpwlM=
-google.golang.org/protobuf v1.36.5/go.mod h1:9fA7Ob0pmnwhb644+1+CVWFRbNajQ6iRojtC/QF5bRE=
+google.golang.org/protobuf v1.36.6 h1:z1NpPI8ku2WgiWnf+t9wTPsn6eP1L7ksHUlkfLvd9xY=
+google.golang.org/protobuf v1.36.6/go.mod h1:jduwjTPXsFjZGTmRluh+L6NjiWu7pchiJ2/5YcXBHnY=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c h1:Hei/4ADfdWqJk1ZMxUNpqntNwaWcugrBjAiHlqqRiVk=
 gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c/go.mod h1:JHkPIbrfpd72SG/EVd6muEfDQjcINNoR0C8j2r3qZ4Q=

@@ -3,6 +3,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/rpc"
 
@@ -39,7 +40,13 @@ type AlertmanagerEndpointPlugin struct{}
 func (p *AlertmanagerEndpointPlugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Response, error) {
 	return plugins.Response{
 		Success: false,
-	}, nil
+	}, errors.New("not implemented")
+}
+
+func (p *AlertmanagerEndpointPlugin) CancelTask(request plugins.CancelTaskRequest) (plugins.Response, error) {
+	return plugins.Response{
+		Success: false,
+	}, errors.New("not implemented")
 }
 
 func (p *AlertmanagerEndpointPlugin) EndpointRequest(request plugins.EndpointRequest) (plugins.Response, error) {
@@ -145,7 +152,7 @@ func (p *AlertmanagerEndpointPlugin) Info(request plugins.InfoRequest) (shared_m
 	return shared_models.Plugin{
 		Name:    "Alertmanager",
 		Type:    "endpoint",
-		Version: "1.2.3",
+		Version: "1.2.4",
 		Author:  "JustNZ",
 		Endpoint: shared_models.Endpoint{
 			ID:    "alertmanager",
@@ -164,6 +171,12 @@ type PluginRPCServer struct {
 
 func (s *PluginRPCServer) ExecuteTask(request plugins.ExecuteTaskRequest, resp *plugins.Response) error {
 	result, err := s.Impl.ExecuteTask(request)
+	*resp = result
+	return err
+}
+
+func (s *PluginRPCServer) CancelTask(request plugins.CancelTaskRequest, resp *plugins.Response) error {
+	result, err := s.Impl.CancelTask(request)
 	*resp = result
 	return err
 }
