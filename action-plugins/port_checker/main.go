@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"net"
 	"net/rpc"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/v1Flows/runner/pkg/executions"
@@ -18,7 +20,25 @@ import (
 // Plugin is an implementation of the Plugin interface
 type Plugin struct{}
 
+var (
+	taskCancels   = make(map[string]context.CancelFunc)
+	taskCancelsMu sync.Mutex
+)
+
 func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Response, error) {
+	ctx, cancel := context.WithCancel(context.Background())
+	stepID := request.Step.ID.String()
+
+	// Store cancel func
+	taskCancelsMu.Lock()
+	taskCancels[stepID] = cancel
+	taskCancelsMu.Unlock()
+	defer func() {
+		taskCancelsMu.Lock()
+		delete(taskCancels, stepID)
+		taskCancelsMu.Unlock()
+	}()
+
 	host := "myhost"
 	port := 22
 	timeout := 3
@@ -32,6 +52,34 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 		if param.Key == "Timeout" {
 			timeout, _ = strconv.Atoi(param.Value)
 		}
+	}
+
+	// Check for cancellation before each major step
+	if ctx.Err() != nil {
+		err := executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
+			ID: request.Step.ID,
+			Messages: []models.Message{
+				{
+					Title: "Cancel",
+					Lines: []models.Line{
+						{
+							Content:   "Action canceled",
+							Color:     "danger",
+							Timestamp: time.Now(),
+						},
+					},
+				},
+			},
+			Status:     "canceled",
+			FinishedAt: time.Now(),
+		}, request.Platform)
+		if err != nil {
+			return plugins.Response{
+				Success: false,
+			}, err
+		}
+
+		return plugins.Response{Success: false, Canceled: true}, nil
 	}
 
 	err := executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
@@ -171,9 +219,19 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 }
 
 func (p *Plugin) CancelTask(request plugins.CancelTaskRequest) (plugins.Response, error) {
-	return plugins.Response{
-		Success: true,
-	}, nil
+	stepID := request.Step.ID.String()
+	taskCancelsMu.Lock()
+	cancel, ok := taskCancels[stepID]
+	taskCancelsMu.Unlock()
+
+	if !ok {
+		return plugins.Response{
+			Success: false,
+		}, errors.New("task not found")
+	}
+
+	cancel()
+	return plugins.Response{Success: true}, nil
 }
 
 func (p *Plugin) EndpointRequest(request plugins.EndpointRequest) (plugins.Response, error) {
@@ -186,7 +244,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Port Checker",
 		Type:    "action",
-		Version: "1.3.1",
+		Version: "1.4.0",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Port Checker",
