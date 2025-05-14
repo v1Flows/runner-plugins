@@ -8,6 +8,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/apenella/go-ansible/v2/pkg/execute"
@@ -35,6 +36,11 @@ var ansiToLineColor = map[string]string{
 	"\033[0;0m":  "",           // Reset
 }
 
+var (
+	taskCancels   = make(map[string]context.CancelFunc)
+	taskCancelsMu sync.Mutex
+)
+
 // Function to strip ANSI color codes and map them to models.Line.Color
 func parseAnsiColor(output string) (string, string) {
 	for ansiCode, lineColor := range ansiToLineColor {
@@ -43,6 +49,8 @@ func parseAnsiColor(output string) (string, string) {
 			cleanOutput := strings.ReplaceAll(output, ansiCode, "")
 			cleanOutput = strings.ReplaceAll(cleanOutput, "\033[0m", "") // Remove reset code
 			return cleanOutput, lineColor
+		} else if strings.Contains(output, "Whoops! context canceled") {
+			return output, "danger" // Handle specific error message
 		}
 	}
 	return output, "" // Default: no color
@@ -84,6 +92,19 @@ func handleOutput(output string, color string, request plugins.ExecuteTaskReques
 }
 
 func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Response, error) {
+	ctx, cancel := context.WithCancel(context.Background())
+	stepID := request.Step.ID.String()
+
+	// Store cancel func
+	taskCancelsMu.Lock()
+	taskCancels[stepID] = cancel
+	taskCancelsMu.Unlock()
+	defer func() {
+		taskCancelsMu.Lock()
+		delete(taskCancels, stepID)
+		taskCancelsMu.Unlock()
+	}()
+
 	play := ""
 	inventory := ""
 	become := false
@@ -144,6 +165,34 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 		if param.Key == "private_key" {
 			private_key = param.Value
 		}
+	}
+
+	// Check for cancellation before each major step
+	if ctx.Err() != nil {
+		err := executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
+			ID: request.Step.ID,
+			Messages: []models.Message{
+				{
+					Title: "Collecting Data",
+					Lines: []models.Line{
+						{
+							Content:   "Task canceled",
+							Color:     "danger",
+							Timestamp: time.Now(),
+						},
+					},
+				},
+			},
+			Status:     "canceled",
+			FinishedAt: time.Now(),
+		}, request.Platform)
+		if err != nil {
+			return plugins.Response{
+				Success: false,
+			}, err
+		}
+
+		return plugins.Response{Success: false, Canceled: true}, nil
 	}
 
 	err := executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
@@ -324,7 +373,35 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 		configuration.WithAnsibleForceColor(),
 	)
 
-	err = exec.Execute(context.TODO())
+	// Check for cancellation before each major step
+	if ctx.Err() != nil {
+		err := executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
+			ID: request.Step.ID,
+			Messages: []models.Message{
+				{
+					Title: "Collecting Data",
+					Lines: []models.Line{
+						{
+							Content:   "Task canceled",
+							Color:     "danger",
+							Timestamp: time.Now(),
+						},
+					},
+				},
+			},
+			Status:     "canceled",
+			FinishedAt: time.Now(),
+		}, request.Platform)
+		if err != nil {
+			return plugins.Response{
+				Success: false,
+			}, err
+		}
+
+		return plugins.Response{Success: false, Canceled: true}, nil
+	}
+
+	err = exec.Execute(ctx)
 	if err != nil {
 		err = executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
 			ID: request.Step.ID,
@@ -359,6 +436,34 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 		}, err
 	}
 
+	// Check for cancellation before each major step
+	if ctx.Err() != nil {
+		err := executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
+			ID: request.Step.ID,
+			Messages: []models.Message{
+				{
+					Title: "Collecting Data",
+					Lines: []models.Line{
+						{
+							Content:   "Task canceled",
+							Color:     "danger",
+							Timestamp: time.Now(),
+						},
+					},
+				},
+			},
+			Status:     "canceled",
+			FinishedAt: time.Now(),
+		}, request.Platform)
+		if err != nil {
+			return plugins.Response{
+				Success: false,
+			}, err
+		}
+
+		return plugins.Response{Success: false, Canceled: true}, nil
+	}
+
 	// update the step with the messages
 	err = executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
 		ID: request.Step.ID,
@@ -389,9 +494,19 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 }
 
 func (p *Plugin) CancelTask(request plugins.CancelTaskRequest) (plugins.Response, error) {
-	return plugins.Response{
-		Success: true,
-	}, nil
+	stepID := request.Step.ID.String()
+	taskCancelsMu.Lock()
+	cancel, ok := taskCancels[stepID]
+	taskCancelsMu.Unlock()
+
+	if !ok {
+		return plugins.Response{
+			Success: false,
+		}, errors.New("task not found")
+	}
+
+	cancel()
+	return plugins.Response{Success: true}, nil
 }
 
 func (p *Plugin) EndpointRequest(request plugins.EndpointRequest) (plugins.Response, error) {
@@ -404,7 +519,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Ansible",
 		Type:    "action",
-		Version: "1.1.1",
+		Version: "1.3.0",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Ansible",
