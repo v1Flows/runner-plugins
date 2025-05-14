@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"net/rpc"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/melbahja/goph"
@@ -20,6 +22,11 @@ import (
 // Plugin is an implementation of the Plugin interface
 type Plugin struct{}
 
+var (
+	taskCancels   = make(map[string]context.CancelFunc)
+	taskCancelsMu sync.Mutex
+)
+
 // ifEmpty returns the defaultValue if the input is an empty string, otherwise it returns the input.
 func ifEmpty(input, defaultValue string) string {
 	if input == "" {
@@ -29,28 +36,18 @@ func ifEmpty(input, defaultValue string) string {
 }
 
 func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Response, error) {
-	err := executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
-		ID: request.Step.ID,
-		Messages: []models.Message{
-			{
-				Title: "SSH",
-				Lines: []models.Line{
-					{
-						Content:   "Starting ssh action",
-						Color:     "primary",
-						Timestamp: time.Now(),
-					},
-				},
-			},
-		},
-		Status:    "running",
-		StartedAt: time.Now(),
-	}, request.Platform)
-	if err != nil {
-		return plugins.Response{
-			Success: false,
-		}, err
-	}
+	ctx, cancel := context.WithCancel(context.Background())
+	stepID := request.Step.ID.String()
+
+	// Store cancel func
+	taskCancelsMu.Lock()
+	taskCancels[stepID] = cancel
+	taskCancelsMu.Unlock()
+	defer func() {
+		taskCancelsMu.Lock()
+		delete(taskCancels, stepID)
+		taskCancelsMu.Unlock()
+	}()
 
 	var target string
 	var port uint
@@ -96,6 +93,57 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 		if param.Key == "SudoPassword" {
 			sudoPassword = param.Value
 		}
+	}
+
+	// Check for cancellation before each major step
+	if ctx.Err() != nil {
+		err := executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
+			ID: request.Step.ID,
+			Messages: []models.Message{
+				{
+					Title: "Collecting Data",
+					Lines: []models.Line{
+						{
+							Content:   "Action canceled",
+							Color:     "danger",
+							Timestamp: time.Now(),
+						},
+					},
+				},
+			},
+			Status:     "canceled",
+			FinishedAt: time.Now(),
+		}, request.Platform)
+		if err != nil {
+			return plugins.Response{
+				Success: false,
+			}, err
+		}
+
+		return plugins.Response{Success: false, Canceled: true}, nil
+	}
+
+	err := executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
+		ID: request.Step.ID,
+		Messages: []models.Message{
+			{
+				Title: "SSH",
+				Lines: []models.Line{
+					{
+						Content:   "Starting ssh action",
+						Color:     "primary",
+						Timestamp: time.Now(),
+					},
+				},
+			},
+		},
+		Status:    "running",
+		StartedAt: time.Now(),
+	}, request.Platform)
+	if err != nil {
+		return plugins.Response{
+			Success: false,
+		}, err
 	}
 
 	var auth goph.Auth
@@ -204,6 +252,34 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 		}, err
 	}
 
+	// Check for cancellation before each major step
+	if ctx.Err() != nil {
+		err := executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
+			ID: request.Step.ID,
+			Messages: []models.Message{
+				{
+					Title: "Collecting Data",
+					Lines: []models.Line{
+						{
+							Content:   "Action canceled",
+							Color:     "danger",
+							Timestamp: time.Now(),
+						},
+					},
+				},
+			},
+			Status:     "canceled",
+			FinishedAt: time.Now(),
+		}, request.Platform)
+		if err != nil {
+			return plugins.Response{
+				Success: false,
+			}, err
+		}
+
+		return plugins.Response{Success: false, Canceled: true}, nil
+	}
+
 	client, err := goph.NewConn(&goph.Config{
 		User:     username,
 		Addr:     target,
@@ -283,11 +359,11 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 		// Execute your command.
 		var out []byte
 		if sudo {
-			out, err = client.Run("echo " + sudoPassword + "| sudo -S " + command)
+			out, err = client.RunContext(ctx, "echo "+sudoPassword+"| sudo -S "+command)
 		} else {
-			out, err = client.Run(command)
+			out, err = client.RunContext(ctx, command)
 		}
-		if err != nil {
+		if err != nil && !strings.Contains(err.Error(), "context canceled") {
 			err := executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
 				ID: request.Step.ID,
 				Messages: []models.Message{
@@ -376,6 +452,35 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				}, err
 			}
 		}
+
+		// Check for cancellation before each major step
+		if ctx.Err() != nil {
+			err := executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
+				ID: request.Step.ID,
+				Messages: []models.Message{
+					{
+						Title: "Collecting Data",
+						Lines: []models.Line{
+							{
+								Content:   "Action canceled",
+								Color:     "danger",
+								Timestamp: time.Now(),
+							},
+						},
+					},
+				},
+				Status:     "canceled",
+				FinishedAt: time.Now(),
+			}, request.Platform)
+			if err != nil {
+				return plugins.Response{
+					Success: false,
+				}, err
+			}
+
+			return plugins.Response{Success: false, Canceled: true}, nil
+		}
+
 		if err != nil {
 			return plugins.Response{
 				Success: false,
@@ -412,9 +517,19 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 }
 
 func (p *Plugin) CancelTask(request plugins.CancelTaskRequest) (plugins.Response, error) {
-	return plugins.Response{
-		Success: false,
-	}, nil
+	stepID := request.Step.ID.String()
+	taskCancelsMu.Lock()
+	cancel, ok := taskCancels[stepID]
+	taskCancelsMu.Unlock()
+
+	if !ok {
+		return plugins.Response{
+			Success: false,
+		}, errors.New("task not found")
+	}
+
+	cancel()
+	return plugins.Response{Success: true}, nil
 }
 
 func (p *Plugin) EndpointRequest(request plugins.EndpointRequest) (plugins.Response, error) {
@@ -427,7 +542,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "SSH",
 		Type:    "action",
-		Version: "1.3.2",
+		Version: "1.4.0",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "SSH",
