@@ -1,0 +1,70 @@
+name: Release action-plugins - log
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "action-plugins/log/**"
+
+jobs:
+  build-and-release:
+    name: Build and Release log
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Read Plugin Version
+        id: read_version
+        working-directory: action-plugins/log
+        run: |
+          VERSION=$(cat .version)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Check if Tag or Release Exists
+        id: check-tag-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        run: |
+          TAG_EXISTS=$(git ls-remote --tags origin | grep "refs/tags/log-v${{ steps.read_version.outputs.version }}" || true)
+          RELEASE_EXISTS=$(gh release list --repo ${{ github.repository }} | grep "Release log v${{ steps.read_version.outputs.version }}" || true)
+          if [ -n "$TAG_EXISTS" ] || [ -n "$RELEASE_EXISTS" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.24'
+
+      - name: Build Plugin
+        if: steps.check-tag-release.outputs.skip == 'false'
+        working-directory: action-plugins/log
+        run: |
+          GOOS=darwin GOARCH=amd64 go build -o log-v${{ steps.read_version.outputs.version }}-darwin-amd64
+          GOOS=darwin GOARCH=arm64 go build -o log-v${{ steps.read_version.outputs.version }}-darwin-arm64
+          GOOS=linux GOARCH=amd64 go build -o log-v${{ steps.read_version.outputs.version }}-linux-amd64
+
+      - name: Create Tag
+        if: steps.check-tag-release.outputs.skip == 'false'
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.2
+        with:
+          github_token: ${{ secrets.ACCESS_TOKEN }}
+          custom_tag: log-v${{ steps.read_version.outputs.version }}
+          tag_prefix: ''
+
+      - name: Create Release
+        if: steps.check-tag-release.outputs.skip == 'false'
+        id: create_release
+        uses: ncipollo/release-action@v1
+        with:
+          name: Release log v${{ steps.read_version.outputs.version }}
+          tag: ${{ steps.tag_version.outputs.new_tag }}
+          artifacts: action-plugins/log/log-v${{ steps.read_version.outputs.version }}-*
+          skipIfReleaseExists: true
+          generateReleaseNotes: true
+          token: ${{ secrets.ACCESS_TOKEN }}
