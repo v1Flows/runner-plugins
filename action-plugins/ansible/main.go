@@ -173,7 +173,7 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 			ID: request.Step.ID,
 			Messages: []models.Message{
 				{
-					Title: "Collecting Data",
+					Title: "Cancel",
 					Lines: []models.Line{
 						{
 							Content:   "Action canceled",
@@ -379,7 +379,7 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 			ID: request.Step.ID,
 			Messages: []models.Message{
 				{
-					Title: "Collecting Data",
+					Title: "Cancel",
 					Lines: []models.Line{
 						{
 							Content:   "Action canceled",
@@ -442,7 +442,7 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 			ID: request.Step.ID,
 			Messages: []models.Message{
 				{
-					Title: "Collecting Data",
+					Title: "Cancel",
 					Lines: []models.Line{
 						{
 							Content:   "Action canceled",
