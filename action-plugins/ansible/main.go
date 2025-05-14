@@ -176,7 +176,7 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					Title: "Collecting Data",
 					Lines: []models.Line{
 						{
-							Content:   "Task canceled",
+							Content:   "Action canceled",
 							Color:     "danger",
 							Timestamp: time.Now(),
 						},
@@ -382,7 +382,7 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					Title: "Collecting Data",
 					Lines: []models.Line{
 						{
-							Content:   "Task canceled",
+							Content:   "Action canceled",
 							Color:     "danger",
 							Timestamp: time.Now(),
 						},
@@ -445,7 +445,7 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					Title: "Collecting Data",
 					Lines: []models.Line{
 						{
-							Content:   "Task canceled",
+							Content:   "Action canceled",
 							Color:     "danger",
 							Timestamp: time.Now(),
 						},
