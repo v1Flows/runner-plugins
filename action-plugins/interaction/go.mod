@@ -1,4 +1,4 @@
-module github.com/AlertFlow/rp-interaction
+module github.com/v1Flows/runner-plugins/action-plugins/interaction
 
 go 1.24.0
 

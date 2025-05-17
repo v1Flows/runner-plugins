@@ -1,4 +1,4 @@
-module github.com/AlertFlow/rp-ssh
+module github.com/v1Flows/runner-plugins/action-plugins/ssh
 
 go 1.24.0
 

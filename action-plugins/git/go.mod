@@ -1,4 +1,4 @@
-module github.com/AlertFlow/rp-template
+module github.com/v1Flows/runner-plugins/action-plugins/git
 
 go 1.24.0
 

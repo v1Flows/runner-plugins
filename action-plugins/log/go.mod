@@ -1,4 +1,4 @@
-module github.com/AlertFlow/rp-log
+module github.com/v1Flows/runner-plugins/action-plugins/log
 
 go 1.24.0
 

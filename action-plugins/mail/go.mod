@@ -1,4 +1,4 @@
-module github.com/AlertFlow/rp-mail
+module github.com/v1Flows/runner-plugins/action-plugins/mail
 
 go 1.24.0
 
