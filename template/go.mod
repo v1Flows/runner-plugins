@@ -1,4 +1,4 @@
-module github.com/v1Flows/runner-plugins/action-plugins/log
+module github.com/v1Flows/runner-plugins/template
 
 go 1.24.0
 
