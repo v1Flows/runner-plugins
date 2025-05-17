@@ -131,6 +131,8 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 	becomePass := ""
 	verbose := 0
 	private_key := ""
+	vault_password_file := ""
+	vault_password := ""
 
 	// access action params
 	for _, param := range request.Step.Action.Params {
@@ -178,6 +180,12 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 		}
 		if param.Key == "private_key" {
 			private_key = param.Value
+		}
+		if param.Key == "vault_password_file" {
+			vault_password_file = param.Value
+		}
+		if param.Key == "vault_password" {
+			vault_password = param.Value
 		}
 	}
 
@@ -261,7 +269,6 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				},
 			},
 			Status:     "error",
-			StartedAt:  time.Now(),
 			FinishedAt: time.Now(),
 		}, request.Platform)
 		if err != nil {
@@ -297,7 +304,6 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					},
 				},
 				Status:     "error",
-				StartedAt:  time.Now(),
 				FinishedAt: time.Now(),
 			}, request.Platform)
 			if err != nil {
@@ -340,6 +346,118 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 	} else if verbose == 4 {
 		ansiblePlaybookOptions.Verbose = true
 		ansiblePlaybookOptions.VerboseVVVV = true
+	}
+
+	if vault_password_file != "" && vault_password == "" {
+		ansiblePlaybookOptions.VaultPasswordFile = vault_password_file
+	} else if vault_password != "" {
+		// create a temporary file with the vault password
+		tmpfile, err := os.CreateTemp("", "vault-password")
+		if err != nil {
+			err = executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
+				ID: request.Step.ID,
+				Messages: []models.Message{
+					{
+						Title: "Ansible Playbook",
+						Lines: []models.Line{
+							{
+								Content:   "Failed to create temporary file for vault password",
+								Color:     "danger",
+								Timestamp: time.Now(),
+							},
+							{
+								Content:   sanitizeErrorMessage(err.Error(), password, becomePass),
+								Color:     "danger",
+								Timestamp: time.Now(),
+							},
+						},
+					},
+				},
+				Status:     "error",
+				FinishedAt: time.Now(),
+			}, request.Platform)
+			if err != nil {
+				return plugins.Response{
+					Success: false,
+				}, err
+			}
+			return plugins.Response{
+				Success: false,
+			}, errors.New("failed to create temporary file for vault password")
+		}
+
+		// write the vault password to the temporary file
+		_, err = tmpfile.WriteString(vault_password)
+		if err != nil {
+			err = executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
+				ID: request.Step.ID,
+				Messages: []models.Message{
+					{
+						Title: "Ansible Playbook",
+						Lines: []models.Line{
+							{
+								Content:   "Failed to write vault password to temporary file",
+								Color:     "danger",
+								Timestamp: time.Now(),
+							},
+							{
+								Content:   sanitizeErrorMessage(err.Error(), password, becomePass),
+								Color:     "danger",
+								Timestamp: time.Now(),
+							},
+						},
+					},
+				},
+				Status:     "error",
+				FinishedAt: time.Now(),
+			}, request.Platform)
+			if err != nil {
+				return plugins.Response{
+					Success: false,
+				}, err
+			}
+			return plugins.Response{
+				Success: false,
+			}, errors.New("failed to write vault password to temporary file")
+		}
+
+		// close the temporary file
+		err = tmpfile.Close()
+		if err != nil {
+			err = executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
+				ID: request.Step.ID,
+				Messages: []models.Message{
+					{
+						Title: "Ansible Playbook",
+						Lines: []models.Line{
+							{
+								Content:   "Failed to close temporary file for vault password",
+								Color:     "danger",
+								Timestamp: time.Now(),
+							},
+							{
+								Content:   sanitizeErrorMessage(err.Error(), password, becomePass),
+								Color:     "danger",
+								Timestamp: time.Now(),
+							},
+						},
+					},
+				},
+				Status:     "error",
+				FinishedAt: time.Now(),
+			}, request.Platform)
+			if err != nil {
+				return plugins.Response{
+					Success: false,
+				}, err
+			}
+			return plugins.Response{
+				Success: false,
+			}, errors.New("failed to close temporary file for vault password")
+		}
+
+		// set the vault password file to the temporary file
+		ansiblePlaybookOptions.VaultPasswordFile = tmpfile.Name()
 	}
 
 	playbookCmd := playbook.NewAnsiblePlaybookCmd(
@@ -478,6 +596,43 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 		return plugins.Response{Success: false, Canceled: true}, nil
 	}
 
+	// remove the temporary file if it was created
+	if vault_password_file == "" && vault_password != "" {
+		err = os.Remove(ansiblePlaybookOptions.VaultPasswordFile)
+		if err != nil {
+			err = executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
+				ID: request.Step.ID,
+				Messages: []models.Message{
+					{
+						Title: "Ansible Playbook",
+						Lines: []models.Line{
+							{
+								Content:   "Failed to remove temporary file for vault password",
+								Color:     "danger",
+								Timestamp: time.Now(),
+							},
+							{
+								Content:   sanitizeErrorMessage(err.Error(), password, becomePass),
+								Color:     "danger",
+								Timestamp: time.Now(),
+							},
+						},
+					},
+				},
+				Status:     "error",
+				FinishedAt: time.Now(),
+			}, request.Platform)
+			if err != nil {
+				return plugins.Response{
+					Success: false,
+				}, err
+			}
+			return plugins.Response{
+				Success: false,
+			}, errors.New("failed to remove temporary file for vault password")
+		}
+	}
+
 	// update the step with the messages
 	err = executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
 		ID: request.Step.ID,
@@ -533,7 +688,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Ansible",
 		Type:    "action",
-		Version: "1.3.1",
+		Version: "1.3.2",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Ansible",
@@ -622,6 +777,24 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "",
 					Required:    false,
 					Description: "Become user password",
+				},
+				{
+					Key:         "vault_password_file",
+					Title:       "Vault Password File",
+					Category:    "Vault",
+					Type:        "text",
+					Default:     "",
+					Required:    false,
+					Description: "Path to Vault Password File. The path prefix is the workspace directory: " + request.Workspace,
+				},
+				{
+					Key:         "vault_password",
+					Title:       "Vault Password",
+					Category:    "Vault",
+					Type:        "password",
+					Default:     "",
+					Required:    false,
+					Description: "Vault Password. This will override the vault_password_file",
 				},
 				{
 					Key:         "check",
