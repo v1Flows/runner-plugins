@@ -1,4 +1,4 @@
-module github.com/AlertFlow/rp-wait
+module github.com/v1Flows/runner-plugins/action-plugins/wait
 
 go 1.24.0
 

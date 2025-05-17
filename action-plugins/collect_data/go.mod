@@ -1,4 +1,4 @@
-module github.com/AlertFlow/rp-collect_data
+module github.com/v1Flows/runner-plugins/action-plugins/collect_data
 
 go 1.24.0
 

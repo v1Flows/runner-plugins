@@ -1,4 +1,4 @@
-module github.com/AlertFlow/rp-port-checker
+module github.com/v1Flows/runner-plugins/action-plugins/port_checker
 
 go 1.24.0
 

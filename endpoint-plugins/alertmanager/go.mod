@@ -1,4 +1,4 @@
-module github.com/AlertFlow/rp-alertmanager
+module github.com/v1Flows/runner-plugins/endpoint-plugins/alertmanager
 
 go 1.24.0
 

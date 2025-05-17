@@ -1,4 +1,4 @@
-module github.com/AlertFlow/rp-ping
+module github.com/v1Flows/runner-plugins/action-plugins/ping
 
 go 1.24.0
 

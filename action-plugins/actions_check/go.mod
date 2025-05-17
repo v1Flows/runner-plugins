@@ -1,4 +1,4 @@
-module github.com/AlertFlow/rp-actions_check
+module github.com/v1Flows/runner-plugins/action-plugins/actions_check
 
 go 1.24.0
 
