@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/rpc"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"sync"
@@ -41,19 +42,22 @@ var (
 	taskCancelsMu sync.Mutex
 )
 
+var ansiRegexp = regexp.MustCompile(`\x1b\[[0-9;]*m`)
+
 // Function to strip ANSI color codes and map them to models.Line.Color
 func parseAnsiColor(output string) (string, string) {
 	for ansiCode, lineColor := range ansiToLineColor {
 		if strings.Contains(output, ansiCode) {
-			// Remove the ANSI code from the output
-			cleanOutput := strings.ReplaceAll(output, ansiCode, "")
-			cleanOutput = strings.ReplaceAll(cleanOutput, "\033[0m", "") // Remove reset code
+			// Remove all ANSI codes from the output
+			cleanOutput := ansiRegexp.ReplaceAllString(output, "")
 			return cleanOutput, lineColor
 		} else if strings.Contains(output, "Whoops! context canceled") {
 			return output, "danger" // Handle specific error message
 		}
 	}
-	return output, "" // Default: no color
+	// Remove all ANSI codes even if not mapped
+	cleanOutput := ansiRegexp.ReplaceAllString(output, "")
+	return cleanOutput, "" // Default: no color
 }
 
 type CustomWriter struct {
@@ -89,6 +93,16 @@ func handleOutput(output string, color string, request plugins.ExecuteTaskReques
 	}
 
 	return nil
+}
+
+func sanitizeErrorMessage(msg, password, becomePass string) string {
+	if password != "" {
+		msg = strings.ReplaceAll(msg, password, "****")
+	}
+	if becomePass != "" {
+		msg = strings.ReplaceAll(msg, becomePass, "****")
+	}
+	return msg
 }
 
 func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Response, error) {
@@ -239,7 +253,7 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 							Timestamp: time.Now(),
 						},
 						{
-							Content:   err.Error(),
+							Content:   sanitizeErrorMessage(err.Error(), password, becomePass),
 							Color:     "danger",
 							Timestamp: time.Now(),
 						},
@@ -275,7 +289,7 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 								Timestamp: time.Now(),
 							},
 							{
-								Content:   err.Error(),
+								Content:   sanitizeErrorMessage(err.Error(), password, becomePass),
 								Color:     "danger",
 								Timestamp: time.Now(),
 							},
@@ -350,7 +364,7 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 									Timestamp: time.Now(),
 								},
 								{
-									Content:   err.Error(),
+									Content:   sanitizeErrorMessage(err.Error(), password, becomePass),
 									Color:     "danger",
 									Timestamp: time.Now(),
 								},
@@ -415,7 +429,7 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 							Timestamp: time.Now(),
 						},
 						{
-							Content:   err.Error(),
+							Content:   sanitizeErrorMessage(err.Error(), password, becomePass),
 							Color:     "danger",
 							Timestamp: time.Now(),
 						},
@@ -519,7 +533,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Ansible",
 		Type:    "action",
-		Version: "1.3.0",
+		Version: "1.3.1",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Ansible",

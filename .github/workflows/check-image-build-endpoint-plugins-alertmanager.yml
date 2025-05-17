@@ -1,0 +1,25 @@
+name: Check endpoint-plugins Build - alertmanager
+
+on:
+  pull_request:
+    types: [opened, reopened, edited, synchronize]
+    branches: [ "develop" ]
+    paths:
+      - "endpoint-plugins/alertmanager/**"
+
+jobs:
+  build-plugin:
+    name: Build Plugin
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.24'
+
+      - name: Build Plugin
+        working-directory: endpoint-plugins/alertmanager
+        run: go build
