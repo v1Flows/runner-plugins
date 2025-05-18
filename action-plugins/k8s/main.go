@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/rpc"
+	"sync"
 	"time"
 
 	"github.com/v1Flows/runner/pkg/executions"
@@ -17,21 +19,30 @@ import (
 // Plugin is an implementation of the Plugin interface
 type Plugin struct{}
 
+var (
+	taskCancels   = make(map[string]context.CancelFunc)
+	taskCancelsMu sync.Mutex
+)
+
 func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Response, error) {
 	kubeConfig := ""
-	targetResourceType := ""
-	targetResourceName := ""
+	resourceType := ""
+	resourceName := ""
+	namespace := ""
 	action := ""
 
 	for _, param := range request.Step.Action.Params {
 		if param.Key == "kubeConfig" {
 			kubeConfig = param.Value
 		}
-		if param.Key == "targetResourceType" {
-			targetResourceType = param.Value
+		if param.Key == "resourceType" {
+			resourceType = param.Value
 		}
-		if param.Key == "targetResourceName" {
-			targetResourceName = param.Value
+		if param.Key == "resourceName" {
+			resourceName = param.Value
+		}
+		if param.Key == "namespace" {
+			namespace = param.Value
 		}
 		if param.Key == "action" {
 			action = param.Value
@@ -45,16 +56,24 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				Title: "K8s",
 				Lines: []models.Line{
 					{
-						Content: "K8s Action started",
+						Content:   "K8s Action started",
+						Timestamp: time.Now(),
 					},
 					{
-						Content: "Target Resource Type: " + targetResourceType,
+						Content:   "Resource Type: " + resourceType,
+						Timestamp: time.Now(),
 					},
 					{
-						Content: "Target Resource Name: " + targetResourceName,
+						Content:   "Resource Name: " + resourceName,
+						Timestamp: time.Now(),
 					},
 					{
-						Content: "Action: " + action,
+						Content:   "Namespace: " + namespace,
+						Timestamp: time.Now(),
+					},
+					{
+						Content:   "Action: " + action,
+						Timestamp: time.Now(),
 					},
 				},
 			},
@@ -82,6 +101,22 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 	return plugins.Response{
 		Success: true,
 	}, nil
+}
+
+func (p *Plugin) CancelTask(request plugins.CancelTaskRequest) (plugins.Response, error) {
+	stepID := request.Step.ID.String()
+	taskCancelsMu.Lock()
+	cancel, ok := taskCancels[stepID]
+	taskCancelsMu.Unlock()
+
+	if !ok {
+		return plugins.Response{
+			Success: false,
+		}, errors.New("task not found")
+	}
+
+	cancel()
+	return plugins.Response{Success: true}, nil
 }
 
 func (p *Plugin) EndpointRequest(request plugins.EndpointRequest) (plugins.Response, error) {
@@ -112,30 +147,96 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Required:    true,
 				},
 				{
-					Key:         "targetResourceType",
-					Title:       "Target Resource Type",
+					Key:         "resourceType",
+					Title:       "Resource Type",
 					Description: "Target resource type to perform action on",
 					Type:        "select",
-					Options:     []string{"pod", "deployment"},
-					Default:     "deployment",
-					Required:    true,
+					Options: []models.Option{
+						{
+							Key:   "pod",
+							Value: "Pod",
+						},
+						{
+							Key:   "deployment",
+							Value: "Deployment",
+						},
+						{
+							Key:   "service",
+							Value: "Service",
+						},
+						{
+							Key:   "ingress",
+							Value: "Ingress",
+						},
+						{
+							Key:   "replicaset",
+							Value: "ReplicaSet",
+						},
+						{
+							Key:   "node",
+							Value: "Node",
+						},
+					},
+					Default:  "pod",
+					Required: true,
 				},
 				{
-					Key:         "targetResourceName",
-					Title:       "Target Resource Name",
+					Key:         "resourceName",
+					Title:       "Resource Name",
 					Description: "Target resource name to perform action on",
 					Type:        "text",
 					Default:     "",
 					Required:    true,
 				},
 				{
+					Key:         "namespace",
+					Title:       "Namespace",
+					Description: "Namespace of the target resource",
+					Type:        "text",
+					Default:     "",
+					Required:    false,
+				},
+				{
 					Key:         "action",
 					Title:       "Action",
 					Description: "Action to perform",
 					Type:        "select",
-					Options:     []string{"restart", "scale"},
-					Default:     "restart",
-					Required:    true,
+					Options: []models.Option{
+						{
+							Key:   "get",
+							Value: "Get",
+						},
+						{
+							Key:   "logs",
+							Value: "Logs",
+						},
+						{
+							Key:   "restart",
+							Value: "Restart",
+						},
+						{
+							Key:   "scale",
+							Value: "Scale",
+						},
+						{
+							Key:   "drain",
+							Value: "Drain",
+						},
+						{
+							Key:   "uncordon",
+							Value: "Uncordon",
+						},
+						{
+							Key:   "status",
+							Value: "Status",
+						},
+						{
+							Key:   "top",
+							Value: "Top",
+						},
+					},
+					Default:  "get",
+					Required: true,
 				},
 			},
 		},
@@ -152,6 +253,12 @@ type PluginRPCServer struct {
 
 func (s *PluginRPCServer) ExecuteTask(request plugins.ExecuteTaskRequest, resp *plugins.Response) error {
 	result, err := s.Impl.ExecuteTask(request)
+	*resp = result
+	return err
+}
+
+func (s *PluginRPCServer) CancelTask(request plugins.CancelTaskRequest, resp *plugins.Response) error {
+	result, err := s.Impl.CancelTask(request)
 	*resp = result
 	return err
 }
