@@ -353,7 +353,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Git",
 		Type:    "action",
-		Version: "1.2.0",
+		Version: "1.3.0",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Git",
@@ -399,6 +399,29 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Category:    "Repository",
 				},
 				{
+					Key:         "authentication_method",
+					Title:       "Authentication Method",
+					Type:        "select",
+					Default:     "password",
+					Required:    true,
+					Description: "The authentication method to use",
+					Options: []models.Option{
+						{
+							Key:   "password",
+							Value: "Password",
+						},
+						{
+							Key:   "token",
+							Value: "Token",
+						},
+						{
+							Key:   "private_key",
+							Value: "Private Key",
+						},
+					},
+					Category: "Authentication",
+				},
+				{
 					Key:         "username",
 					Title:       "Username",
 					Type:        "text",
@@ -406,6 +429,10 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Required:    false,
 					Description: "Username for authentication",
 					Category:    "Authentication",
+					DependsOn: models.DependsOn{
+						Key:   "authentication_method",
+						Value: "password",
+					},
 				},
 				{
 					Key:         "password",
@@ -415,6 +442,10 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Required:    false,
 					Description: "Password for authentication",
 					Category:    "Authentication",
+					DependsOn: models.DependsOn{
+						Key:   "authentication_method",
+						Value: "password",
+					},
 				},
 				{
 					Key:         "token",
@@ -424,6 +455,10 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Required:    false,
 					Description: "Token for authentication. If provided, username and password will be ignored",
 					Category:    "Authentication",
+					DependsOn: models.DependsOn{
+						Key:   "authentication_method",
+						Value: "token",
+					},
 				},
 				{
 					Key:         "private_key",
@@ -433,6 +468,10 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Required:    false,
 					Description: "Private key for authentication",
 					Category:    "Authentication",
+					DependsOn: models.DependsOn{
+						Key:   "authentication_method",
+						Value: "private_key",
+					},
 				},
 				{
 					Key:         "private_key_passphrase",
@@ -442,6 +481,10 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Required:    false,
 					Description: "Passphrase for the private key",
 					Category:    "Authentication",
+					DependsOn: models.DependsOn{
+						Key:   "authentication_method",
+						Value: "private_key",
+					},
 				},
 			},
 		},

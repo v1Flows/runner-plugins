@@ -54,6 +54,8 @@ github.com/mattn/go-isatty v0.0.12/go.mod h1:cbi8OIDigv2wuxKPP5vlRcQ1OAZbq2CE4Ky
 github.com/mattn/go-isatty v0.0.14/go.mod h1:7GGIvUiUoEMVVmxf/4nioHXj79iQHKdU27kJ6hsGG94=
 github.com/mattn/go-isatty v0.0.20 h1:xfD0iDuEKnDkl03q4limB+vH+GxLEtL/jb4xVJSWWEY=
 github.com/mattn/go-isatty v0.0.20/go.mod h1:W+V8PltTTMOvKvAeJH7IuucS94S2C6jfK/D7dTCTo3Y=
+github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e h1:fD57ERR4JtEqsWbfPhv4DMiApHyliiK5xCTNVSPiaAs=
+github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e/go.mod h1:zD1mROLANZcx1PVRCS0qkT7pwLkGfwJo4zjcN/Tysno=
 github.com/oklog/run v1.0.0 h1:Ru7dDtJNOyC66gQ5dQmaCa0qIsAUFY3sFpK1Xk8igrw=
 github.com/oklog/run v1.0.0/go.mod h1:dlhp/R75TPv97u0XWUtDeV/lRKWPKSdTuV0TZvrmrQA=
 github.com/pelletier/go-toml/v2 v2.2.3 h1:YmeHyLY8mFWbdkNWwpr+qIL2bEqT0o95WSdkNHvL12M=
@@ -99,10 +101,10 @@ github.com/v1Flows/alertFlow/services/backend v0.0.0-20250317112742-7a11f04dd445
 github.com/v1Flows/alertFlow/services/backend v0.0.0-20250317112742-7a11f04dd445/go.mod h1:wN72OUmADQ95eNYyiYM4oa6FOnvoCBRljzsGQGdvaIA=
 github.com/v1Flows/exFlow/services/backend v0.0.0-20250314134041-010ef4dcb540 h1:Fu/mOZKwyRpm8QP5FfgAnDfv1XjgEJAKjHNzTVlIxW0=
 github.com/v1Flows/exFlow/services/backend v0.0.0-20250314134041-010ef4dcb540/go.mod h1:63Ad53i4eEkN3C6QeTsOWvLASjn43+cEwrWAcllX8So=
-github.com/v1Flows/runner v1.1.0 h1:AczXQnZmNj8GGVb05NEIDwt+8Reie2O/OlHqFWRgj/U=
-github.com/v1Flows/runner v1.1.0/go.mod h1:kWTSUeYYs1Y3hEsUyLITfWP1wQwZr7IjFWMZKqoI0wg=
-github.com/v1Flows/shared-library v1.0.21 h1:G7GFplYrvmTRzJBvzSlqFEli54a+QlhORPdZ4pAC3ps=
-github.com/v1Flows/shared-library v1.0.21/go.mod h1:UVP6m6Nri6JC3L0xS3wkbqGvfQJ5fsYIJx81Gfj1TFw=
+github.com/v1Flows/runner v1.1.2 h1:BbsDv9pGVR4fUChf5PmAkR8BGkUrZpFhlueTAznNCqg=
+github.com/v1Flows/runner v1.1.2/go.mod h1:R7YkcZAm0Amn+pdA8n1TxhHO5O1LuN+AW3hAjuIdPH8=
+github.com/v1Flows/shared-library v1.0.23 h1:xczFEU4SOGVeg1hCFof5A3FjKnPv5kXmf746EWPS4EA=
+github.com/v1Flows/shared-library v1.0.23/go.mod h1:UVP6m6Nri6JC3L0xS3wkbqGvfQJ5fsYIJx81Gfj1TFw=
 github.com/vmihailenco/msgpack/v5 v5.4.1 h1:cQriyiUvjTwOHg8QZaPihLWeRAAVoCpE00IUPn0Bjt8=
 github.com/vmihailenco/msgpack/v5 v5.4.1/go.mod h1:GaZTsDaehaPpQVyxrf5mtQlH+pc21PIudVV/E3rRQok=
 github.com/vmihailenco/tagparser/v2 v2.0.0 h1:y09buUbR+b5aycVFQs/g70pqKVZNBmxwAhO7/IwNM9g=
@@ -145,8 +147,8 @@ google.golang.org/grpc v1.70.0/go.mod h1:ofIJqVKDXx/JiXrwr2IG4/zwdH9txy3IlF40Rmc
 google.golang.org/protobuf v1.36.6 h1:z1NpPI8ku2WgiWnf+t9wTPsn6eP1L7ksHUlkfLvd9xY=
 google.golang.org/protobuf v1.36.6/go.mod h1:jduwjTPXsFjZGTmRluh+L6NjiWu7pchiJ2/5YcXBHnY=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
-gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c h1:Hei/4ADfdWqJk1ZMxUNpqntNwaWcugrBjAiHlqqRiVk=
-gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c/go.mod h1:JHkPIbrfpd72SG/EVd6muEfDQjcINNoR0C8j2r3qZ4Q=
+gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f h1:BLraFXnmrev5lT+xlilqcH8XK9/i0At2xKjWk4p6zsU=
+gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/yaml.v2 v2.4.0 h1:D8xgwECY7CYvx+Y2n4sBz93Jn9JRvxdiyyo8CTfuKaY=
 gopkg.in/yaml.v2 v2.4.0/go.mod h1:RDklbk79AGWmwhnvt/jBztapEOGDOx6ZbXqjP6csGnQ=
 gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=

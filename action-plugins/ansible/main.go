@@ -688,7 +688,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Ansible",
 		Type:    "action",
-		Version: "1.3.2",
+		Version: "1.4.0",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Ansible",
@@ -716,6 +716,25 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Description: "Path to the inventory file or comma separated host list. The path prefix is the workspace directory: " + request.Workspace,
 				},
 				{
+					Key:         "authentication_method",
+					Title:       "Authentication Method",
+					Type:        "select",
+					Default:     "password",
+					Required:    true,
+					Description: "The authentication method to use",
+					Options: []models.Option{
+						{
+							Key:   "password",
+							Value: "Password",
+						},
+						{
+							Key:   "private_key_file",
+							Value: "Private Key File",
+						},
+					},
+					Category: "Authentication",
+				},
+				{
 					Key:         "user",
 					Title:       "User",
 					Category:    "Authentication",
@@ -723,6 +742,10 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "",
 					Required:    false,
 					Description: "Connect as this user",
+					DependsOn: models.DependsOn{
+						Key:   "authentication_method",
+						Value: "password",
+					},
 				},
 				{
 					Key:         "password",
@@ -732,6 +755,10 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "",
 					Required:    false,
 					Description: "Connection user password",
+					DependsOn: models.DependsOn{
+						Key:   "authentication_method",
+						Value: "password",
+					},
 				},
 				{
 					Key:         "private_key",
@@ -741,6 +768,10 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "",
 					Required:    false,
 					Description: "Path to the private key file",
+					DependsOn: models.DependsOn{
+						Key:   "authentication_method",
+						Value: "private_key_file",
+					},
 				},
 				{
 					Key:         "limit",
@@ -757,7 +788,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Category:    "Sudo",
 					Type:        "boolean",
 					Default:     "false",
-					Required:    false,
+					Required:    true,
 					Description: "Run playbook with become",
 				},
 				{
@@ -768,6 +799,10 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "root",
 					Required:    false,
 					Description: "User to run become tasks with",
+					DependsOn: models.DependsOn{
+						Key:   "become",
+						Value: "true",
+					},
 				},
 				{
 					Key:         "become_pass",
@@ -777,6 +812,10 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "",
 					Required:    false,
 					Description: "Become user password",
+					DependsOn: models.DependsOn{
+						Key:   "become",
+						Value: "true",
+					},
 				},
 				{
 					Key:         "vault_password_file",
