@@ -5,7 +5,7 @@ go 1.24.0
 require (
 	github.com/hashicorp/go-plugin v1.6.3
 	github.com/melbahja/goph v1.4.0
-	github.com/v1Flows/runner v1.1.2
+	github.com/v1Flows/runner v1.1.3
 	github.com/v1Flows/shared-library v1.0.23
 	golang.org/x/crypto v0.38.0
 )
