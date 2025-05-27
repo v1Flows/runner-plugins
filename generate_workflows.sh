@@ -100,6 +100,17 @@ jobs:
           github_token: \${{ secrets.ACCESS_TOKEN }}
           custom_tag: $plugin-v\${{ steps.read_version.outputs.version }}
           tag_prefix: ''
+      
+      - name: Update -latest Tag
+        if: steps.check-tag-release.outputs.skip == 'false'
+        run: |
+          set -e
+          # Delete local and remote -latest tag if it exists
+          git tag -d $plugin-latest 2>/dev/null || true
+          git push origin :refs/tags/$plugin-latest 2>/dev/null || true
+          # Create new -latest tag at current commit
+          git tag $plugin-latest
+          git push origin $plugin-latest --force
 
       - name: Create Release
         if: steps.check-tag-release.outputs.skip == 'false'
