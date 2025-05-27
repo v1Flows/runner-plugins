@@ -244,7 +244,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Port Checker",
 		Type:    "action",
-		Version: "1.4.0",
+		Version: "1.4.1",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Port Checker",
