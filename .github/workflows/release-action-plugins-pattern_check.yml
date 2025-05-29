@@ -68,9 +68,9 @@ jobs:
           git tag pattern_check-latest
           git push origin pattern_check-latest --force
 
-      - name: Create Release
+      - name: Create Version Release
         if: steps.check-tag-release.outputs.skip == 'false'
-        id: create_release
+        id: create_version_release
         uses: ncipollo/release-action@v1
         with:
           name: Release pattern_check v${{ steps.read_version.outputs.version }}
@@ -78,4 +78,16 @@ jobs:
           artifacts: action-plugins/pattern_check/pattern_check-v${{ steps.read_version.outputs.version }}-*
           skipIfReleaseExists: true
           generateReleaseNotes: true
+          token: ${{ secrets.ACCESS_TOKEN }}
+      
+      - name: Create Latest Release
+        if: steps.check-tag-release.outputs.skip == 'false'
+        id: create_latest_release
+        uses: ncipollo/release-action@v1
+        with:
+          name: Release pattern_check latest
+          tag: pattern_check-latest
+          artifacts: action-plugins/pattern_check/pattern_check-v${{ steps.read_version.outputs.version }}-*
+          skipIfReleaseExists: false
+          generateReleaseNotes: false
           token: ${{ secrets.ACCESS_TOKEN }}
