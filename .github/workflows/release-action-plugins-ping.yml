@@ -47,6 +47,9 @@ jobs:
           GOOS=darwin GOARCH=amd64 go build -o ping-v${{ steps.read_version.outputs.version }}-darwin-amd64
           GOOS=darwin GOARCH=arm64 go build -o ping-v${{ steps.read_version.outputs.version }}-darwin-arm64
           GOOS=linux GOARCH=amd64 go build -o ping-v${{ steps.read_version.outputs.version }}-linux-amd64
+          GOOS=darwin GOARCH=amd64 go build -o ping-latest-darwin-amd64
+          GOOS=darwin GOARCH=arm64 go build -o ping-latest-darwin-arm64
+          GOOS=linux GOARCH=amd64 go build -o ping-latest-linux-amd64
 
       - name: Create Tag
         if: steps.check-tag-release.outputs.skip == 'false'
@@ -87,7 +90,7 @@ jobs:
         with:
           name: Release ping latest
           tag: ping-latest
-          artifacts: action-plugins/ping/ping-v${{ steps.read_version.outputs.version }}-*
+          artifacts: action-plugins/ping/ping-latest-*
           skipIfReleaseExists: false
           generateReleaseNotes: false
           token: ${{ secrets.ACCESS_TOKEN }}
