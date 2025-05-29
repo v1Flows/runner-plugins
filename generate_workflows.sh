@@ -91,6 +91,9 @@ jobs:
           GOOS=darwin GOARCH=amd64 go build -o $plugin-v\${{ steps.read_version.outputs.version }}-darwin-amd64
           GOOS=darwin GOARCH=arm64 go build -o $plugin-v\${{ steps.read_version.outputs.version }}-darwin-arm64
           GOOS=linux GOARCH=amd64 go build -o $plugin-v\${{ steps.read_version.outputs.version }}-linux-amd64
+          GOOS=darwin GOARCH=amd64 go build -o $plugin-latest-darwin-amd64
+          GOOS=darwin GOARCH=arm64 go build -o $plugin-latest-darwin-arm64
+          GOOS=linux GOARCH=amd64 go build -o $plugin-latest-linux-amd64
 
       - name: Create Tag
         if: steps.check-tag-release.outputs.skip == 'false'
@@ -131,7 +134,7 @@ jobs:
         with:
           name: Release $plugin latest
           tag: $plugin-latest
-          artifacts: $type/$plugin/$plugin-v\${{ steps.read_version.outputs.version }}-*
+          artifacts: $type/$plugin/$plugin-latest-*
           skipIfReleaseExists: false
           generateReleaseNotes: false
           token: \${{ secrets.ACCESS_TOKEN }}

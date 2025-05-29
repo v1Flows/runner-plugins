@@ -47,6 +47,9 @@ jobs:
           GOOS=darwin GOARCH=amd64 go build -o ssh-v${{ steps.read_version.outputs.version }}-darwin-amd64
           GOOS=darwin GOARCH=arm64 go build -o ssh-v${{ steps.read_version.outputs.version }}-darwin-arm64
           GOOS=linux GOARCH=amd64 go build -o ssh-v${{ steps.read_version.outputs.version }}-linux-amd64
+          GOOS=darwin GOARCH=amd64 go build -o ssh-latest-darwin-amd64
+          GOOS=darwin GOARCH=arm64 go build -o ssh-latest-darwin-arm64
+          GOOS=linux GOARCH=amd64 go build -o ssh-latest-linux-amd64
 
       - name: Create Tag
         if: steps.check-tag-release.outputs.skip == 'false'
@@ -87,7 +90,7 @@ jobs:
         with:
           name: Release ssh latest
           tag: ssh-latest
-          artifacts: action-plugins/ssh/ssh-v${{ steps.read_version.outputs.version }}-*
+          artifacts: action-plugins/ssh/ssh-latest-*
           skipIfReleaseExists: false
           generateReleaseNotes: false
           token: ${{ secrets.ACCESS_TOKEN }}

@@ -47,6 +47,9 @@ jobs:
           GOOS=darwin GOARCH=amd64 go build -o interaction-v${{ steps.read_version.outputs.version }}-darwin-amd64
           GOOS=darwin GOARCH=arm64 go build -o interaction-v${{ steps.read_version.outputs.version }}-darwin-arm64
           GOOS=linux GOARCH=amd64 go build -o interaction-v${{ steps.read_version.outputs.version }}-linux-amd64
+          GOOS=darwin GOARCH=amd64 go build -o interaction-latest-darwin-amd64
+          GOOS=darwin GOARCH=arm64 go build -o interaction-latest-darwin-arm64
+          GOOS=linux GOARCH=amd64 go build -o interaction-latest-linux-amd64
 
       - name: Create Tag
         if: steps.check-tag-release.outputs.skip == 'false'
@@ -87,7 +90,7 @@ jobs:
         with:
           name: Release interaction latest
           tag: interaction-latest
-          artifacts: action-plugins/interaction/interaction-v${{ steps.read_version.outputs.version }}-*
+          artifacts: action-plugins/interaction/interaction-latest-*
           skipIfReleaseExists: false
           generateReleaseNotes: false
           token: ${{ secrets.ACCESS_TOKEN }}
