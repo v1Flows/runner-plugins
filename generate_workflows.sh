@@ -112,9 +112,9 @@ jobs:
           git tag $plugin-latest
           git push origin $plugin-latest --force
 
-      - name: Create Release
+      - name: Create Version Release
         if: steps.check-tag-release.outputs.skip == 'false'
-        id: create_release
+        id: create_version_release
         uses: ncipollo/release-action@v1
         with:
           name: Release $plugin v\${{ steps.read_version.outputs.version }}
@@ -122,6 +122,18 @@ jobs:
           artifacts: $type/$plugin/$plugin-v\${{ steps.read_version.outputs.version }}-*
           skipIfReleaseExists: true
           generateReleaseNotes: true
+          token: \${{ secrets.ACCESS_TOKEN }}
+      
+      - name: Create Latest Release
+        if: steps.check-tag-release.outputs.skip == 'false'
+        id: create_latest_release
+        uses: ncipollo/release-action@v1
+        with:
+          name: Release $plugin latest
+          tag: $plugin-latest
+          artifacts: $type/$plugin/$plugin-v\${{ steps.read_version.outputs.version }}-*
+          skipIfReleaseExists: false
+          generateReleaseNotes: false
           token: \${{ secrets.ACCESS_TOKEN }}
 EOL
 

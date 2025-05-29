@@ -68,9 +68,9 @@ jobs:
           git tag port_checker-latest
           git push origin port_checker-latest --force
 
-      - name: Create Release
+      - name: Create Version Release
         if: steps.check-tag-release.outputs.skip == 'false'
-        id: create_release
+        id: create_version_release
         uses: ncipollo/release-action@v1
         with:
           name: Release port_checker v${{ steps.read_version.outputs.version }}
@@ -78,4 +78,16 @@ jobs:
           artifacts: action-plugins/port_checker/port_checker-v${{ steps.read_version.outputs.version }}-*
           skipIfReleaseExists: true
           generateReleaseNotes: true
+          token: ${{ secrets.ACCESS_TOKEN }}
+      
+      - name: Create Latest Release
+        if: steps.check-tag-release.outputs.skip == 'false'
+        id: create_latest_release
+        uses: ncipollo/release-action@v1
+        with:
+          name: Release port_checker latest
+          tag: port_checker-latest
+          artifacts: action-plugins/port_checker/port_checker-v${{ steps.read_version.outputs.version }}-*
+          skipIfReleaseExists: false
+          generateReleaseNotes: false
           token: ${{ secrets.ACCESS_TOKEN }}
