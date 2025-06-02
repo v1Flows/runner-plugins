@@ -62,35 +62,35 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 
 	// access action params
 	for _, param := range request.Step.Action.Params {
-		if param.Key == "Target" {
+		if param.Key == "target" {
 			target = param.Value
 		}
-		if param.Key == "Port" {
+		if param.Key == "port" {
 			portInt, _ := strconv.ParseUint(param.Value, 10, 16)
 			port = uint(portInt)
 		}
-		if param.Key == "Username" {
+		if param.Key == "username" {
 			username = param.Value
 		}
-		if param.Key == "Password" {
+		if param.Key == "password" {
 			password = param.Value
 		}
-		if param.Key == "PrivateKeyFile" {
+		if param.Key == "private_key_file" {
 			privateKeyFile = param.Value
 		}
-		if param.Key == "PrivateKeyFilePassword" {
+		if param.Key == "private_key_file_password" {
 			privateKeyFilePassword = param.Value
 		}
-		if param.Key == "UseSSHAgent" {
+		if param.Key == "use_ssh_agent" {
 			useSSHAgent = strings.ToLower(param.Value) == "true"
 		}
-		if param.Key == "Commands" {
+		if param.Key == "commands" {
 			commands = strings.Split(param.Value, "\n")
 		}
-		if param.Key == "Sudo" {
+		if param.Key == "sudo" {
 			sudo = strings.ToLower(param.Value) == "true"
 		}
-		if param.Key == "SudoPassword" {
+		if param.Key == "sudo_password" {
 			sudoPassword = param.Value
 		}
 	}
@@ -542,7 +542,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "SSH",
 		Type:    "action",
-		Version: "1.5.2",
+		Version: "1.5.3",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "SSH",
