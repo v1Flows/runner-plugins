@@ -5,7 +5,7 @@ go 1.24.0
 require (
 	github.com/hashicorp/go-plugin v1.6.3
 	github.com/prometheus-community/pro-bing v0.7.0
-	github.com/v1Flows/runner v1.2.1
+	github.com/v1Flows/runner v1.2.3
 	github.com/v1Flows/shared-library v1.0.23
 )
 
