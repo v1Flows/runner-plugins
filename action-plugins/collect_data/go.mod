@@ -6,7 +6,7 @@ require (
 	github.com/hashicorp/go-plugin v1.6.3
 	github.com/v1Flows/alertFlow/services/backend v0.0.0-20250317112742-7a11f04dd445
 	github.com/v1Flows/runner v1.2.4
-	github.com/v1Flows/shared-library v1.0.23
+	github.com/v1Flows/shared-library v1.0.24
 )
 
 require (
