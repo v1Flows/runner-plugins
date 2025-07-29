@@ -6,6 +6,7 @@ import (
 	"net/rpc"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/v1Flows/runner/pkg/executions"
@@ -24,7 +25,25 @@ import (
 // Plugin is an implementation of the Plugin interface
 type Plugin struct{}
 
+var (
+	taskCancels   = make(map[string]context.CancelFunc)
+	taskCancelsMu sync.Mutex
+)
+
 func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Response, error) {
+	ctx, cancel := context.WithCancel(context.Background())
+	stepID := request.Step.ID.String()
+
+	// Store cancel func
+	taskCancelsMu.Lock()
+	taskCancels[stepID] = cancel
+	taskCancelsMu.Unlock()
+	defer func() {
+		taskCancelsMu.Lock()
+		delete(taskCancels, stepID)
+		taskCancelsMu.Unlock()
+	}()
+
 	tf_version := ""
 	workdir := request.Workspace
 	init := false
@@ -83,6 +102,34 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 		}
 	}
 
+	// Check for cancellation before each major step
+	if ctx.Err() != nil {
+		err := executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
+			ID: request.Step.ID,
+			Messages: []models.Message{
+				{
+					Title: "Cancel",
+					Lines: []models.Line{
+						{
+							Content:   "Action canceled",
+							Color:     "danger",
+							Timestamp: time.Now(),
+						},
+					},
+				},
+			},
+			Status:     "canceled",
+			FinishedAt: time.Now(),
+		}, request.Platform)
+		if err != nil {
+			return plugins.Response{
+				Success: false,
+			}, err
+		}
+
+		return plugins.Response{Success: false, Canceled: true}, nil
+	}
+
 	err := executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
 		ID: request.Step.ID,
 		Messages: []models.Message{
@@ -108,8 +155,6 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 		Product: product.Terraform,
 		Version: version.Must(version.NewVersion(tf_version)),
 	}
-
-	ctx := context.Background()
 
 	execPath, err := installer.Install(ctx)
 	if err != nil {
@@ -163,6 +208,34 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 		return plugins.Response{
 			Success: false,
 		}, err
+	}
+
+	// Check for cancellation before each major step
+	if ctx.Err() != nil {
+		err := executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
+			ID: request.Step.ID,
+			Messages: []models.Message{
+				{
+					Title: "Cancel",
+					Lines: []models.Line{
+						{
+							Content:   "Action canceled",
+							Color:     "danger",
+							Timestamp: time.Now(),
+						},
+					},
+				},
+			},
+			Status:     "canceled",
+			FinishedAt: time.Now(),
+		}, request.Platform)
+		if err != nil {
+			return plugins.Response{
+				Success: false,
+			}, err
+		}
+
+		return plugins.Response{Success: false, Canceled: true}, nil
 	}
 
 	tf, err := tfexec.NewTerraform(workdir, execPath)
@@ -433,6 +506,34 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 		}
 	}
 
+	// Check for cancellation before each major step
+	if ctx.Err() != nil {
+		err := executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
+			ID: request.Step.ID,
+			Messages: []models.Message{
+				{
+					Title: "Cancel",
+					Lines: []models.Line{
+						{
+							Content:   "Action canceled",
+							Color:     "danger",
+							Timestamp: time.Now(),
+						},
+					},
+				},
+			},
+			Status:     "canceled",
+			FinishedAt: time.Now(),
+		}, request.Platform)
+		if err != nil {
+			return plugins.Response{
+				Success: false,
+			}, err
+		}
+
+		return plugins.Response{Success: false, Canceled: true}, nil
+	}
+
 	if apply {
 		// Fail if no plan_output is specified
 		if plan_output == "" {
@@ -545,6 +646,22 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 	}, nil
 }
 
+func (p *Plugin) CancelTask(request plugins.CancelTaskRequest) (plugins.Response, error) {
+	stepID := request.Step.ID.String()
+	taskCancelsMu.Lock()
+	cancel, ok := taskCancels[stepID]
+	taskCancelsMu.Unlock()
+
+	if !ok {
+		return plugins.Response{
+			Success: false,
+		}, errors.New("task not found")
+	}
+
+	cancel()
+	return plugins.Response{Success: true}, nil
+}
+
 func (p *Plugin) EndpointRequest(request plugins.EndpointRequest) (plugins.Response, error) {
 	return plugins.Response{
 		Success: false,
@@ -641,6 +758,12 @@ type PluginRPCServer struct {
 
 func (s *PluginRPCServer) ExecuteTask(request plugins.ExecuteTaskRequest, resp *plugins.Response) error {
 	result, err := s.Impl.ExecuteTask(request)
+	*resp = result
+	return err
+}
+
+func (s *PluginRPCServer) CancelTask(request plugins.CancelTaskRequest, resp *plugins.Response) error {
+	result, err := s.Impl.CancelTask(request)
 	*resp = result
 	return err
 }
