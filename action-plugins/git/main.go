@@ -46,6 +46,7 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 	branch := ""
 	directory := ""
 	username := ""
+	authentication := false
 	password := ""
 	token := ""
 	privateKey := ""
@@ -67,6 +68,13 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 		}
 		if param.Key == "username" {
 			username = param.Value
+		}
+		if param.Key == "authentication" {
+			if param.Value == "true" {
+				authentication = true
+			} else {
+				authentication = false
+			}
 		}
 		if param.Key == "password" {
 			password = param.Value
@@ -133,23 +141,8 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 		}, err
 	}
 
-	if privateKey == "" {
-		// clone the repository with basic auth (username and password or token)
+	if !authentication {
 		_, err = git.PlainClone(directory, false, &git.CloneOptions{
-			Auth: &http.BasicAuth{
-				Username: func() string {
-					if token != "" {
-						return "abc123"
-					}
-					return username
-				}(),
-				Password: func() string {
-					if token != "" {
-						return token
-					}
-					return password
-				}(),
-			},
 			URL:           url,
 			Progress:      os.Stdout,
 			RemoteName:    remoteName,
@@ -188,114 +181,171 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 			}, err
 		}
 	} else {
-		// clone the repository with ssh key
 
-		// check if private key file exists
-		if _, err := os.Stat(privateKey); os.IsNotExist(err) {
-			err := executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
-				ID: request.Step.ID,
-				Messages: []models.Message{
-					{
-						Title: "Git",
-						Lines: []models.Line{
-							{
-								Content:   "Error cloning repository",
-								Color:     "danger",
-								Timestamp: time.Now(),
-							},
-							{
-								Content:   "Private key file does not exist",
-								Color:     "danger",
-								Timestamp: time.Now(),
+		if privateKey == "" {
+			// clone the repository with basic auth (username and password or token)
+			_, err = git.PlainClone(directory, false, &git.CloneOptions{
+				Auth: &http.BasicAuth{
+					Username: func() string {
+						if token != "" {
+							return "abc123"
+						}
+						return username
+					}(),
+					Password: func() string {
+						if token != "" {
+							return token
+						}
+						return password
+					}(),
+				},
+				URL:           url,
+				Progress:      os.Stdout,
+				RemoteName:    remoteName,
+				ReferenceName: plumbing.ReferenceName(branch),
+			})
+			if err != nil {
+				err := executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
+					ID: request.Step.ID,
+					Messages: []models.Message{
+						{
+							Title: "Git",
+							Lines: []models.Line{
+								{
+									Content:   "Error cloning repository",
+									Color:     "danger",
+									Timestamp: time.Now(),
+								},
+								{
+									Content:   err.Error(),
+									Color:     "danger",
+									Timestamp: time.Now(),
+								},
 							},
 						},
 					},
-				},
-				Status:     "error",
-				FinishedAt: time.Now(),
-			}, request.Platform)
-			if err != nil {
+					Status:     "error",
+					FinishedAt: time.Now(),
+				}, request.Platform)
+				if err != nil {
+					return plugins.Response{
+						Success: false,
+					}, err
+				}
 				return plugins.Response{
 					Success: false,
 				}, err
 			}
-			return plugins.Response{
-				Success: false,
-			}, errors.New("private key file does not exist")
-		}
+		} else {
+			// clone the repository with ssh key
 
-		publicKeys, err := ssh.NewPublicKeysFromFile("git", privateKey, privateKeyPassphrase)
-		if err != nil {
-			err := executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
-				ID: request.Step.ID,
-				Messages: []models.Message{
-					{
-						Title: "Git",
-						Lines: []models.Line{
-							{
-								Content:   "Error cloning repository",
-								Color:     "danger",
-								Timestamp: time.Now(),
-							},
-							{
-								Content:   err.Error(),
-								Color:     "danger",
-								Timestamp: time.Now(),
+			// check if private key file exists
+			if _, err := os.Stat(privateKey); os.IsNotExist(err) {
+				err := executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
+					ID: request.Step.ID,
+					Messages: []models.Message{
+						{
+							Title: "Git",
+							Lines: []models.Line{
+								{
+									Content:   "Error cloning repository",
+									Color:     "danger",
+									Timestamp: time.Now(),
+								},
+								{
+									Content:   "Private key file does not exist",
+									Color:     "danger",
+									Timestamp: time.Now(),
+								},
 							},
 						},
 					},
-				},
-				Status:     "error",
-				FinishedAt: time.Now(),
-			}, request.Platform)
+					Status:     "error",
+					FinishedAt: time.Now(),
+				}, request.Platform)
+				if err != nil {
+					return plugins.Response{
+						Success: false,
+					}, err
+				}
+				return plugins.Response{
+					Success: false,
+				}, errors.New("private key file does not exist")
+			}
+
+			publicKeys, err := ssh.NewPublicKeysFromFile("git", privateKey, privateKeyPassphrase)
 			if err != nil {
+				err := executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
+					ID: request.Step.ID,
+					Messages: []models.Message{
+						{
+							Title: "Git",
+							Lines: []models.Line{
+								{
+									Content:   "Error cloning repository",
+									Color:     "danger",
+									Timestamp: time.Now(),
+								},
+								{
+									Content:   err.Error(),
+									Color:     "danger",
+									Timestamp: time.Now(),
+								},
+							},
+						},
+					},
+					Status:     "error",
+					FinishedAt: time.Now(),
+				}, request.Platform)
+				if err != nil {
+					return plugins.Response{
+						Success: false,
+					}, err
+				}
 				return plugins.Response{
 					Success: false,
 				}, err
 			}
-			return plugins.Response{
-				Success: false,
-			}, err
-		}
 
-		_, err = git.PlainClone(directory, false, &git.CloneOptions{
-			Auth:          publicKeys,
-			URL:           url,
-			Progress:      os.Stdout,
-			RemoteName:    remoteName,
-			ReferenceName: plumbing.ReferenceName(branch),
-		})
-		if err != nil {
-			err := executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
-				ID: request.Step.ID,
-				Messages: []models.Message{
-					{
-						Title: "Git",
-						Lines: []models.Line{
-							{
-								Content:   "Error cloning repository",
-								Color:     "danger",
-								Timestamp: time.Now(),
-							},
-							{
-								Content:   err.Error(),
-								Color:     "danger",
-								Timestamp: time.Now(),
+			_, err = git.PlainClone(directory, false, &git.CloneOptions{
+				Auth:          publicKeys,
+				URL:           url,
+				Progress:      os.Stdout,
+				RemoteName:    remoteName,
+				ReferenceName: plumbing.ReferenceName(branch),
+			})
+			if err != nil {
+				err := executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
+					ID: request.Step.ID,
+					Messages: []models.Message{
+						{
+							Title: "Git",
+							Lines: []models.Line{
+								{
+									Content:   "Error cloning repository",
+									Color:     "danger",
+									Timestamp: time.Now(),
+								},
+								{
+									Content:   err.Error(),
+									Color:     "danger",
+									Timestamp: time.Now(),
+								},
 							},
 						},
 					},
-				},
-				Status:     "error",
-				FinishedAt: time.Now(),
-			}, request.Platform)
-			if err != nil {
+					Status:     "error",
+					FinishedAt: time.Now(),
+				}, request.Platform)
+				if err != nil {
+					return plugins.Response{
+						Success: false,
+					}, err
+				}
 				return plugins.Response{
 					Success: false,
 				}, err
 			}
-			return plugins.Response{
-				Success: false,
-			}, err
 		}
 	}
 
@@ -353,7 +403,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Git",
 		Type:    "action",
-		Version: "1.3.2",
+		Version: "1.3.3",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Git",
@@ -399,10 +449,19 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Category:    "Repository",
 				},
 				{
+					Key:         "authentication",
+					Title:       "Authentication",
+					Category:    "Authentication",
+					Type:        "boolean",
+					Default:     "false",
+					Required:    true,
+					Description: "Enable authentication for the repository",
+				},
+				{
 					Key:         "authentication_method",
 					Title:       "Authentication Method",
 					Type:        "select",
-					Default:     "password",
+					Default:     "",
 					Required:    true,
 					Description: "The authentication method to use",
 					Options: []models.Option{
@@ -420,6 +479,10 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 						},
 					},
 					Category: "Authentication",
+					DependsOn: models.DependsOn{
+						Key:   "authentication",
+						Value: "true",
+					},
 				},
 				{
 					Key:         "username",
