@@ -1,7 +1,7 @@
 version: 2
 updates:
   - package-ecosystem: "gomod"
-    directory: "./action-plugins/step_analysis"
+    directory: "./action-plugins/terraform"
     schedule:
       interval: "weekly"
     labels:
@@ -26,6 +26,14 @@ updates:
     target-branch: "develop"
   - package-ecosystem: "gomod"
     directory: "./action-plugins/ping"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 5
+    target-branch: "develop"
+  - package-ecosystem: "gomod"
+    directory: "./action-plugins/test"
     schedule:
       interval: "weekly"
     labels:
@@ -98,6 +106,14 @@ updates:
     target-branch: "develop"
   - package-ecosystem: "gomod"
     directory: "./action-plugins/collect_data"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 5
+    target-branch: "develop"
+  - package-ecosystem: "gomod"
+    directory: "./template"
     schedule:
       interval: "weekly"
     labels:
