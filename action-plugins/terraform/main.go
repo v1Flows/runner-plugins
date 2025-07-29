@@ -676,7 +676,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Terraform",
-			Description: "Init, Plan, Apply, Destroy Terraform",
+			Description: "Init, Plan, Apply Terraform",
 			Plugin:      "terraform",
 			Icon:        "logos:terraform-icon",
 			Category:    "Utility",
