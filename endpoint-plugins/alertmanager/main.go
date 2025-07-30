@@ -152,7 +152,7 @@ func (p *AlertmanagerEndpointPlugin) Info(request plugins.InfoRequest) (shared_m
 	return shared_models.Plugin{
 		Name:    "Alertmanager",
 		Type:    "endpoint",
-		Version: "1.2.6",
+		Version: "1.2.7",
 		Author:  "JustNZ",
 		Endpoint: shared_models.Endpoint{
 			ID:    "alertmanager",

@@ -309,7 +309,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Ping",
 		Type:    "action",
-		Version: "1.5.2",
+		Version: "1.5.3",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Ping",
