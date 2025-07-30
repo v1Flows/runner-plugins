@@ -105,6 +105,14 @@ updates:
     open-pull-requests-limit: 5
     target-branch: "develop"
   - package-ecosystem: "gomod"
+    directory: "./action-plugins/debug"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 5
+    target-branch: "develop"
+  - package-ecosystem: "gomod"
     directory: "./action-plugins/collect_data"
     schedule:
       interval: "weekly"
