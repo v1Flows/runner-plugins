@@ -211,14 +211,14 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Mail",
 		Type:    "action",
-		Version: "1.4.2",
+		Version: "1.4.3",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Mail",
 			Description: "Send an email",
 			Plugin:      "mail",
 			Icon:        "hugeicons:mail-02",
-			Category:    "Utility",
+			Category:    "Notification",
 			Params: []models.Params{
 				{
 					Key:         "From",
