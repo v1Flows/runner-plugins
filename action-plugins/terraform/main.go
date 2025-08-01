@@ -76,8 +76,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 							Title: "Terraform",
 							Lines: []models.Line{
 								{
-									Content: "Terraform Plan Output file cannot end with .tf",
-									Color:   "danger",
+									Content:   "Terraform Plan Output file cannot end with .tf",
+									Color:     "danger",
+									Timestamp: time.Now(),
 								},
 							},
 						},
@@ -137,7 +138,8 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				Title: "Terraform",
 				Lines: []models.Line{
 					{
-						Content: "Terraform Action started",
+						Content:   "Terraform Action started",
+						Timestamp: time.Now(),
 					},
 				},
 			},
@@ -165,12 +167,14 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					Title: "Terraform",
 					Lines: []models.Line{
 						{
-							Content: "Terraform Install failed",
-							Color:   "danger",
+							Content:   "Terraform Install failed",
+							Color:     "danger",
+							Timestamp: time.Now(),
 						},
 						{
-							Content: err.Error(),
-							Color:   "danger",
+							Content:   err.Error(),
+							Color:     "danger",
+							Timestamp: time.Now(),
 						},
 					},
 				},
@@ -196,8 +200,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				Title: "Terraform",
 				Lines: []models.Line{
 					{
-						Content: "Terraform Install completed",
-						Color:   "success",
+						Content:   "Terraform Install completed",
+						Color:     "success",
+						Timestamp: time.Now(),
 					},
 				},
 			},
@@ -247,12 +252,14 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					Title: "Terraform",
 					Lines: []models.Line{
 						{
-							Content: "Terraform NewTerraform failed",
-							Color:   "danger",
+							Content:   "Terraform NewTerraform failed",
+							Color:     "danger",
+							Timestamp: time.Now(),
 						},
 						{
-							Content: err.Error(),
-							Color:   "danger",
+							Content:   err.Error(),
+							Color:     "danger",
+							Timestamp: time.Now(),
 						},
 					},
 				},
@@ -278,8 +285,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				Title: "Terraform",
 				Lines: []models.Line{
 					{
-						Content: "Terraform NewTerraform completed",
-						Color:   "success",
+						Content:   "Terraform NewTerraform completed",
+						Color:     "success",
+						Timestamp: time.Now(),
 					},
 				},
 			},
@@ -302,12 +310,14 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 						Title: "Terraform",
 						Lines: []models.Line{
 							{
-								Content: "Terraform Init failed",
-								Color:   "danger",
+								Content:   "Terraform Init failed",
+								Color:     "danger",
+								Timestamp: time.Now(),
 							},
 							{
-								Content: err.Error(),
-								Color:   "danger",
+								Content:   err.Error(),
+								Color:     "danger",
+								Timestamp: time.Now(),
 							},
 						},
 					},
@@ -333,8 +343,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					Title: "Terraform",
 					Lines: []models.Line{
 						{
-							Content: "Terraform Init completed",
-							Color:   "success",
+							Content:   "Terraform Init completed",
+							Color:     "success",
+							Timestamp: time.Now(),
 						},
 					},
 				},
@@ -358,12 +369,14 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 						Title: "Terraform",
 						Lines: []models.Line{
 							{
-								Content: "Terraform Plan failed",
-								Color:   "danger",
+								Content:   "Terraform Plan failed",
+								Color:     "danger",
+								Timestamp: time.Now(),
 							},
 							{
-								Content: err.Error(),
-								Color:   "danger",
+								Content:   err.Error(),
+								Color:     "danger",
+								Timestamp: time.Now(),
 							},
 						},
 					},
@@ -390,8 +403,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 						Title: "Terraform",
 						Lines: []models.Line{
 							{
-								Content: "Terraform Plan has changes",
-								Color:   "warning",
+								Content:   "Terraform Plan has changes",
+								Color:     "warning",
+								Timestamp: time.Now(),
 							},
 						},
 					},
@@ -414,16 +428,19 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 								Title: "Terraform",
 								Lines: []models.Line{
 									{
-										Content: "Terraform Plan show failed",
-										Color:   "danger",
+										Content:   "Terraform Plan show failed",
+										Color:     "danger",
+										Timestamp: time.Now(),
 									},
 									{
-										Content: "Plan output file: " + plan_output,
-										Color:   "danger",
+										Content:   "Plan output file: " + plan_output,
+										Color:     "danger",
+										Timestamp: time.Now(),
 									},
 									{
-										Content: err.Error(),
-										Color:   "danger",
+										Content:   err.Error(),
+										Color:     "danger",
+										Timestamp: time.Now(),
 									},
 								},
 							},
@@ -459,8 +476,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 						}
 					}
 					messageLines = append(messageLines, models.Line{
-						Content: line,
-						Color:   color, // Assign the color
+						Content:   line,
+						Color:     color, // Assign the color
+						Timestamp: time.Now(),
 					})
 				}
 
@@ -490,8 +508,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 						Title: "Terraform",
 						Lines: []models.Line{
 							{
-								Content: "Terraform Plan has no changes",
-								Color:   "success",
+								Content:   "Terraform Plan has no changes",
+								Color:     "success",
+								Timestamp: time.Now(),
 							},
 						},
 					},
@@ -544,8 +563,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 						Title: "Terraform",
 						Lines: []models.Line{
 							{
-								Content: "Terraform Apply requires a plan_output file",
-								Color:   "danger",
+								Content:   "Terraform Apply requires a plan_output file",
+								Color:     "danger",
+								Timestamp: time.Now(),
 							},
 						},
 					},
@@ -573,12 +593,14 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 						Title: "Terraform",
 						Lines: []models.Line{
 							{
-								Content: "Terraform Apply failed",
-								Color:   "danger",
+								Content:   "Terraform Apply failed",
+								Color:     "danger",
+								Timestamp: time.Now(),
 							},
 							{
-								Content: err.Error(),
-								Color:   "danger",
+								Content:   err.Error(),
+								Color:     "danger",
+								Timestamp: time.Now(),
 							},
 						},
 					},
@@ -604,8 +626,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 					Title: "Terraform",
 					Lines: []models.Line{
 						{
-							Content: "Terraform Apply completed",
-							Color:   "success",
+							Content:   "Terraform Apply completed",
+							Color:     "success",
+							Timestamp: time.Now(),
 						},
 					},
 				},
@@ -626,8 +649,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				Title: "Terraform",
 				Lines: []models.Line{
 					{
-						Content: "Terraform Action completed",
-						Color:   "success",
+						Content:   "Terraform Action completed",
+						Color:     "success",
+						Timestamp: time.Now(),
 					},
 				},
 			},
@@ -672,7 +696,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Terraform",
 		Type:    "action",
-		Version: "1.0.1",
+		Version: "1.0.2",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Terraform",
