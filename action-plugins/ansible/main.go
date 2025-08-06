@@ -125,6 +125,7 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 	limit := ""
 	check := false
 	diff := false
+	authentication := false
 	user := ""
 	password := ""
 	becomeUser := ""
@@ -162,6 +163,9 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 		}
 		if param.Key == "diff" {
 			diff = param.Value == "true"
+		}
+		if param.Key == "authentication" {
+			authentication = param.Value == "true"
 		}
 		if param.Key == "user" {
 			user = param.Value
@@ -317,21 +321,35 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 		}
 	}
 
-	ansiblePlaybookOptions := &playbook.AnsiblePlaybookOptions{
-		Connection:    "ssh",
-		Inventory:     inventory,
-		Become:        become,
-		Limit:         limit,
-		Check:         check,
-		Diff:          diff,
-		User:          user,
-		BecomeUser:    becomeUser,
-		SSHCommonArgs: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null",
-		ExtraVars: map[string]interface{}{
-			"ansible_password":    password,
-			"ansible_become_pass": becomePass,
-		},
-		PrivateKey: private_key,
+	var ansiblePlaybookOptions *playbook.AnsiblePlaybookOptions
+	if !authentication {
+		ansiblePlaybookOptions = &playbook.AnsiblePlaybookOptions{
+			Connection:    "ssh",
+			Inventory:     inventory,
+			Become:        become,
+			Limit:         limit,
+			Check:         check,
+			Diff:          diff,
+			SSHCommonArgs: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null",
+			PrivateKey:    private_key,
+		}
+	} else {
+		ansiblePlaybookOptions = &playbook.AnsiblePlaybookOptions{
+			Connection:    "ssh",
+			Inventory:     inventory,
+			Become:        become,
+			Limit:         limit,
+			Check:         check,
+			Diff:          diff,
+			User:          user,
+			BecomeUser:    becomeUser,
+			SSHCommonArgs: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null",
+			ExtraVars: map[string]interface{}{
+				"ansible_password":    password,
+				"ansible_become_pass": becomePass,
+			},
+			PrivateKey: private_key,
+		}
 	}
 
 	if verbose == 1 {
@@ -688,7 +706,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Ansible",
 		Type:    "action",
-		Version: "1.4.3",
+		Version: "1.4.4",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Ansible",
@@ -716,13 +734,26 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Description: "Path to the inventory file or comma separated host list. The path prefix is the workspace directory: " + request.Workspace,
 				},
 				{
+					Key:         "authentication",
+					Title:       "Authentication",
+					Category:    "Authentication",
+					Type:        "boolean",
+					Default:     "false",
+					Required:    true,
+					Description: "Use authentication for the Ansible connection. If enabled, you must provide a authentication method.",
+				},
+				{
 					Key:         "authentication_method",
 					Title:       "Authentication Method",
 					Type:        "select",
-					Default:     "password",
-					Required:    true,
+					Default:     "none",
+					Required:    false,
 					Description: "The authentication method to use",
 					Options: []models.Option{
+						{
+							Key:   "none",
+							Value: "None",
+						},
 						{
 							Key:   "password",
 							Value: "Password",
@@ -733,6 +764,10 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 						},
 					},
 					Category: "Authentication",
+					DependsOn: models.DependsOn{
+						Key:   "authentication",
+						Value: "true",
+					},
 				},
 				{
 					Key:         "user",
@@ -789,7 +824,11 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Type:        "boolean",
 					Default:     "false",
 					Required:    true,
-					Description: "Run playbook with become",
+					Description: "Run playbook with become. Requires authentication to be enabled",
+					DependsOn: models.DependsOn{
+						Key:   "authentication",
+						Value: "true",
+					},
 				},
 				{
 					Key:         "become_user",
