@@ -5,7 +5,7 @@ go 1.24.0
 require (
 	github.com/hashicorp/go-plugin v1.6.3
 	github.com/melbahja/goph v1.4.0
-	github.com/v1Flows/runner v1.3.0
+	github.com/v1Flows/runner v1.3.2
 	github.com/v1Flows/shared-library v1.0.25
 	golang.org/x/crypto v0.40.0
 )
@@ -13,7 +13,7 @@ require (
 require (
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/fsnotify/fsnotify v1.8.0 // indirect
-	github.com/go-viper/mapstructure/v2 v2.2.1 // indirect
+	github.com/go-viper/mapstructure/v2 v2.3.0 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.2 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/uuid v1.6.0 // indirect
@@ -24,7 +24,7 @@ require (
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/oklog/run v1.0.0 // indirect
-	github.com/pelletier/go-toml/v2 v2.2.3 // indirect
+	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pkg/sftp v1.13.7 // indirect
 	github.com/puzpuzpuz/xsync/v3 v3.5.1 // indirect
