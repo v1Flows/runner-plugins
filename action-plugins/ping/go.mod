@@ -6,7 +6,7 @@ require (
 	github.com/hashicorp/go-plugin v1.6.3
 	github.com/prometheus-community/pro-bing v0.7.0
 	github.com/v1Flows/runner v1.3.0
-	github.com/v1Flows/shared-library v1.0.25
+	github.com/v1Flows/shared-library v1.0.27
 )
 
 require (
