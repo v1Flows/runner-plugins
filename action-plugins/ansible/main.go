@@ -139,7 +139,7 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 	for _, param := range request.Step.Action.Params {
 		if param.Key == "playbook" {
 			if strings.Contains(param.Value, "/") {
-				play = request.Workspace + param.Value
+				play = param.Value
 			} else {
 				play = param.Value
 			}
@@ -147,7 +147,7 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 		if param.Key == "inventory" {
 			// if inventory is a path prefix with workspace
 			if strings.Contains(param.Value, "/") {
-				inventory = request.Workspace + param.Value
+				inventory = param.Value
 			} else {
 				inventory = param.Value
 			}
@@ -720,18 +720,18 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Title:       "Playbook",
 					Category:    "General",
 					Type:        "text",
-					Default:     "",
+					Default:     request.Workspace + "/",
 					Required:    true,
-					Description: "Path to the playbook file. The path prefix is the workspace directory: " + request.Workspace,
+					Description: "Path to the playbook file",
 				},
 				{
 					Key:         "inventory",
 					Title:       "Inventory",
 					Category:    "General",
 					Type:        "text",
-					Default:     "",
+					Default:     request.Workspace + "/",
 					Required:    true,
-					Description: "Path to the inventory file or comma separated host list. The path prefix is the workspace directory: " + request.Workspace,
+					Description: "Path to the inventory file or comma separated host list",
 				},
 				{
 					Key:         "authentication",
@@ -861,9 +861,9 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Title:       "Vault Password File",
 					Category:    "Vault",
 					Type:        "text",
-					Default:     "",
+					Default:     request.Workspace + "/",
 					Required:    false,
-					Description: "Path to Vault Password File. The path prefix is the workspace directory: " + request.Workspace,
+					Description: "Path to Vault Password File",
 				},
 				{
 					Key:         "vault_password",
