@@ -37,21 +37,73 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 		taskCancelsMu.Unlock()
 	}()
 
-	// target := "www.alertflow.org"
-	// count := 3
-	// maxLostPackages := 0
+	service := ""
+	subject := ""
+	message := ""
+	amazonSESSender := ""
+	amazonSESReceivers := ""
+	amazonSNSQueueTopics := ""
+	barkDeviceKey := ""
+	dingTalkAccessToken := ""
+	dingTalkSecret := ""
+	discordChannelID := ""
+	httpURL := ""
+	lineChannelSecret := ""
+	lineChannelAccessToken := ""
+	lineReceivers := ""
+	lineReceiversToken := ""
+	microsoftTeamsWebhookURLs := ""
 
-	// for _, param := range request.Step.Action.Params {
-	// 	if param.Key == "target" {
-	// 		target = param.Value
-	// 	}
-	// 	if param.Key == "count" {
-	// 		count, _ = strconv.Atoi(param.Value)
-	// 	}
-	// 	if param.Key == "maxLostPackages" {
-	// 		maxLostPackages, _ = strconv.Atoi(param.Value)
-	// 	}
-	// }
+	for _, param := range request.Step.Action.Params {
+		if param.Key == "service" {
+			service = param.Value
+		}
+		if param.Key == "subject" {
+			subject = param.Value
+		}
+		if param.Key == "message" {
+			message = param.Value
+		}
+		if param.Key == "amazonSESSender" {
+			amazonSESSender = param.Value
+		}
+		if param.Key == "amazonSESReceivers" {
+			amazonSESReceivers = param.Value
+		}
+		if param.Key == "amazonSNSQueueTopics" {
+			amazonSNSQueueTopics = param.Value
+		}
+		if param.Key == "barkDeviceKey" {
+			barkDeviceKey = param.Value
+		}
+		if param.Key == "dingTalkAccessToken" {
+			dingTalkAccessToken = param.Value
+		}
+		if param.Key == "dingTalkSecret" {
+			dingTalkSecret = param.Value
+		}
+		if param.Key == "discordChannelID" {
+			discordChannelID = param.Value
+		}
+		if param.Key == "httpURL" {
+			httpURL = param.Value
+		}
+		if param.Key == "lineChannelSecret" {
+			lineChannelSecret = param.Value
+		}
+		if param.Key == "lineChannelAccessToken" {
+			lineChannelAccessToken = param.Value
+		}
+		if param.Key == "lineReceivers" {
+			lineReceivers = param.Value
+		}
+		if param.Key == "lineReceiversToken" {
+			lineReceiversToken = param.Value
+		}
+		if param.Key == "microsoftTeamsWebhookURLs" {
+			microsoftTeamsWebhookURLs = param.Value
+		}
+	}
 
 	// Check for cancellation before each major step
 	if ctx.Err() != nil {
@@ -88,7 +140,7 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				Title: "Notify",
 				Lines: []models.Line{
 					{
-						Content:   "Notify Service",
+						Content:   "Notify Service " + service,
 						Timestamp: time.Now(),
 					},
 				},
@@ -101,6 +153,72 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 		return plugins.Response{
 			Success: false,
 		}, err
+	}
+
+	switch service {
+	case "amazon_ses":
+		err = sendAmazonSESNotification(ctx, request.Config, request.Execution.ID.String(), request.Step.ID.String(), amazonSESSender, amazonSESReceivers, subject, message)
+		if err != nil {
+			return plugins.Response{
+				Success: false,
+			}, err
+		}
+	case "amazon_sns":
+		err = sendAmazonSNSNotification(ctx, request.Config, request.Execution.ID.String(), request.Step.ID.String(), amazonSNSQueueTopics, subject, message)
+		if err != nil {
+			return plugins.Response{
+				Success: false,
+			}, err
+		}
+	case "bark":
+		err = sendBarkNotification(ctx, request.Config, request.Execution.ID.String(), request.Step.ID.String(), barkDeviceKey, subject, message)
+		if err != nil {
+			return plugins.Response{
+				Success: false,
+			}, err
+		}
+	case "dingtalk":
+		err = sendDingTalkNotification(ctx, request.Config, request.Execution.ID.String(), request.Step.ID.String(), dingTalkAccessToken, dingTalkSecret, subject, message)
+		if err != nil {
+			return plugins.Response{
+				Success: false,
+			}, err
+		}
+	case "discord":
+		err = sendDiscordNotification(ctx, request.Config, request.Execution.ID.String(), request.Step.ID.String(), discordChannelID, subject, message)
+		if err != nil {
+			return plugins.Response{
+				Success: false,
+			}, err
+		}
+	case "http":
+		err = sendHTTPNotification(ctx, request.Config, request.Execution.ID.String(), request.Step.ID.String(), httpURL, subject, message)
+		if err != nil {
+			return plugins.Response{
+				Success: false,
+			}, err
+		}
+	case "line":
+		err = sendLineNotification(ctx, request.Config, request.Execution.ID.String(), request.Step.ID.String(), lineChannelSecret, lineChannelAccessToken, lineReceivers, subject, message)
+		if err != nil {
+			return plugins.Response{
+				Success: false,
+			}, err
+		}
+	case "line_notify":
+		err = sendLineNotifyNotification(ctx, request.Config, request.Execution.ID.String(), request.Step.ID.String(), lineReceiversToken, subject, message)
+		if err != nil {
+			return plugins.Response{
+				Success: false,
+			}, err
+		}
+	case "microsoft_teams":
+		err = sendMicrosoftTeamsNotification(ctx, request.Config, request.Execution.ID.String(), request.Step.ID.String(), microsoftTeamsWebhookURLs, subject, message)
+		if err != nil {
+			return plugins.Response{
+				Success: false,
+			}, err
+		}
 	}
 
 	err = executions.UpdateStep(request.Config, request.Execution.ID.String(), models.ExecutionSteps{
@@ -278,16 +396,16 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Title:       "Subject",
 					Type:        "text",
 					Default:     "Notification",
-					Required:    false,
+					Required:    true,
 					Description: "Subject of the notification",
 					Category:    "General",
 				},
 				{
 					Key:         "message",
 					Title:       "Message",
-					Type:        "text",
+					Type:        "textarea",
 					Default:     "This is a notification",
-					Required:    false,
+					Required:    true,
 					Description: "Message of the notification",
 					Category:    "General",
 				},
