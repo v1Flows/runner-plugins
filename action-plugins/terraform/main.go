@@ -93,7 +93,7 @@ func (p *Plugin) ExecuteTask(request plugins.ExecuteTaskRequest) (plugins.Respon
 				}
 			}
 
-			plan_output = workdir + "/" + param.Value
+			plan_output = param.Value
 		}
 		if param.Key == "plan_show" {
 			plan_show, _ = strconv.ParseBool(param.Value)
@@ -696,7 +696,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 	var plugin = models.Plugin{
 		Name:    "Terraform",
 		Type:    "action",
-		Version: "1.0.2",
+		Version: "1.0.3",
 		Author:  "JustNZ",
 		Action: models.Action{
 			Name:        "Terraform",
@@ -719,9 +719,9 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Title:       "Working Directory",
 					Type:        "text",
 					Category:    "General",
-					Default:     "",
+					Default:     request.Workspace + "/",
 					Required:    true,
-					Description: "Working directory where terraform files are located. The path prefix is the workspace directory: " + request.Workspace,
+					Description: "Working directory where terraform files are located",
 				},
 				{
 					Key:         "init",
@@ -746,9 +746,9 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Title:       "Plan Output",
 					Type:        "text",
 					Category:    "Plan",
-					Default:     "",
+					Default:     request.Workspace + "/plan.tfplan",
 					Required:    false,
-					Description: "Output the terraform plan to a file. The path prefix is the workspace directory: " + request.Workspace,
+					Description: "Output the terraform plan to a file",
 					DependsOn: models.DependsOn{
 						Key:   "plan",
 						Value: "true",
@@ -761,7 +761,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Category:    "Plan",
 					Default:     "false",
 					Required:    false,
-					Description: "Show the terraform plan output. Requires a plan_output file. The path prefix is the workspace directory: " + request.Workspace,
+					Description: "Show the terraform plan output. Requires a plan_output file",
 					DependsOn: models.DependsOn{
 						Key:   "plan_output",
 						Value: "*",
@@ -774,7 +774,7 @@ func (p *Plugin) Info(request plugins.InfoRequest) (models.Plugin, error) {
 					Default:     "false",
 					Category:    "Apply",
 					Required:    false,
-					Description: "Perform an terraform apply. Requires a plan_output file. The path prefix is the workspace directory: " + request.Workspace,
+					Description: "Perform an terraform apply. Requires a plan_output file",
 					DependsOn: models.DependsOn{
 						Key:   "plan_output",
 						Value: "*",
